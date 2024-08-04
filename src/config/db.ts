@@ -21,7 +21,7 @@ const config: Config = {
 };
 
 const getMongoUrl = async (env: string = "development"): Promise<string> => {
-  return config[env]?.MONGODB_URI as string; 
+  return config[env.trim()]?.MONGODB_URI as string;
 };
 
 const connectDB = async () => {
