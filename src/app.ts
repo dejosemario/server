@@ -17,6 +17,7 @@ class EventfulApp {
 
   private initializeMiddlewares() {
     this.app.use(express.json());
+    this.app.use(express.urlencoded({ extended: true }));
   }
 
   private initializeRoutes() {
