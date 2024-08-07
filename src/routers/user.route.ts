@@ -4,15 +4,20 @@ import  {wrapper } from '../utils'
 
 
 
-class userRoutes{
-     userRoute = Router();
+class UserRoutes{
+     router = express.Router();
+
     constructor(){
-        this.initializeRoutes();
+        this.initailizeRoutes();
     }
     
     private initailizeRoutes(){
 
-        this.userRoute.get('/',wrapper(this.urlController.))
+        // this.router.get('/',wrapper(this.urlController.))
     }
 
 }
+
+const userRoutes = new UserRoutes();
+
+export default userRoutes;

@@ -19,13 +19,18 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
-    isAdmin: {
-      type: Boolean,
-      default: false,
-      required: false,
+    // isAdmin: {
+    //   type: Boolean,
+    //   default: false,
+    //   required: false,
+    // },
+    role: {
+      type: String,
+      enum: ["creator", "eventee"],
+      default: "eventee",
     },
   },
-  { timest amps: true }
+  { timestamps: true }
 );
 
 const User = mongoose.model("User", userSchema);

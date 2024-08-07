@@ -1,5 +1,15 @@
-import express, { Express, Request, Response, NextFunction } from "express";
-import {connectDB} from "./config/db";
+import express, {
+  Express,
+  Request,
+  Response,
+  NextFunction,
+  Router,
+} from "express";
+import { connectDB } from "./config/db";
+import routes from "./routers/index";
+import cookieParser from "cookie-parser";
+import cors from "cors";
+import morgan from "morgan";
 
 class EventfulApp {
   public app: Express; // Property to store the Express app instance
@@ -11,18 +21,31 @@ class EventfulApp {
     this.port = port;
     this.appName = this.constructor.name;
     this.initializeMiddlewares();
-    this.initializeRoutes();
+    this.initializeRoutes(routes);
     this.initializeErrorHandling();
   }
 
   private initializeMiddlewares() {
+    // Enable Cross Origin Resource Sharing
+    // const corsOptions = {
+    //   origin: process.env.FRONTEND_URL,
+    //   credentials: true,
+    //   optionsSuccessStatus: 200,
+    // };
+    // this.app.use(cors(corsOptions));
     this.app.use(express.json());
+    this.app.use(cookieParser());
+    this.app.use(morgan("dev"));
     this.app.use(express.urlencoded({ extended: true }));
   }
 
-  private initializeRoutes() {
-    this.app.get("/", (req: Request, res: Response) => {
-      res.send("Hello World!");
+  private initializeRoutes(routes: Router[]) {
+    routes.forEach((route: Router) => {
+      this.app.use("/api/v1/", route);
+    });
+
+    this.app.all("*", (req: Request, res: Response) => {
+      res.status(404).json({ success: false, message: "Page not Found" });
     });
   }
 
