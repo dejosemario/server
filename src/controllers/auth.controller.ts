@@ -18,7 +18,7 @@ export class AuthController extends BaseController {
     }
 
     const data = await this.authService.createUser(req.body);
-    if (data) return this.success(res, 200, "User created", data);
+    if (data) return this.success(res, 200, "User registered", data);
     this.error(res, error.message || "Internal Error", error.statusCode || 500);
   };
 
@@ -29,7 +29,8 @@ export class AuthController extends BaseController {
     const { token, user } = await this.authService.login(email, password);
     if (user) {
       res.cookie(this.tokenName, token, { httpOnly: true });
+      return this.success(res, 200, "login successful", user);
     }
-    return this.success(res, 200, "login successful", user);
+    this.error(res, error.message || "Internal Error", error.statusCode || 500);
   };
 }

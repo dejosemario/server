@@ -1,8 +1,9 @@
-import { get } from "http";
-import User from "../models/users";
+import User from "../models/users.model";
 import { hashPassword, comparePassword, generateToken } from "../utils";
+import SendResponse from "../utils/sendResponse";
 
-export default class AuthService {
+export default class AuthService   {
+  
   async getUserByEmail(email: string) {
     const user = await User.findOne({ email });
 
@@ -22,10 +23,10 @@ export default class AuthService {
 
   public async login(email: string, password: string) {
     const user = await this.getUserByEmail(email);
-    if (!user) throw { message: "User not found", statusCode: 404 };
+    if (!user) throw{ message: "User not found", statusCode: 404 };  
     const isValidPassword = await comparePassword(password, user.password);
     if (!isValidPassword)
-      throw { message: "Invalid credentials", statusCode: 403 };
+      throw { message: "Invalid Password", statusCode: 403 };
     const token = generateToken({ id: user.id, firstName: user.name });
     return { token, user };
   }

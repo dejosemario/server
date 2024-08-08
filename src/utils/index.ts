@@ -1,8 +1,10 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
+// import { config } from "dotenv";
+// config();
 
-const secretKey = "your-secret-key";
+const secretKey = process.env.JWT_SECRET_KEY as string ?? "secret_key" ;
 
 //Function to generate a random id
 export const generateId = (length: number = 5): string => {
