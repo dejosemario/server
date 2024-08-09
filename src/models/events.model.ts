@@ -7,6 +7,7 @@ interface EventDocument extends Document {
   time: string;
   location: string;
   defaultReminderDate?: Date;
+  creator: mongoose.Types.ObjectId; // Reference to the User
 }
 
 const eventSchema = new Schema<EventDocument>({
@@ -36,7 +37,13 @@ const eventSchema = new Schema<EventDocument>({
   defaultReminderDate: {
     type: Date,
     required: false
+  },
+  creator: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
   }
+
 }, { timestamps: true });
 
 const Event = mongoose.model<EventDocument>('Event', eventSchema);

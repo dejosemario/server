@@ -1,6 +1,14 @@
-import mongoose from "mongoose";
+import mongoose, {Document, Schema} from "mongoose";
 
-const userSchema = new mongoose.Schema(
+interface UserDocument extends Document {
+  name: string;
+  email: string;
+  password: string;
+  profilePicture: string;
+  role: string; // For example, 'creator' or 'eventee'
+}
+
+const userSchema  = new Schema<UserDocument>(
   {
     name: {
       type: String,
@@ -33,6 +41,18 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const User = mongoose.model("User", userSchema);
+// Add toJSON options
+userSchema.set('toJSON', {
+  virtuals: true,
+  versionKey: false,
+  transform: function (doc, user) {
+    delete user._id;
+    delete user.password;
+    return user;
+  },
+});
+
+
+const User = mongoose.model<UserDocument>("User", userSchema);
 
 export default User;

@@ -29,6 +29,7 @@ const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
   }
   try {
     const payload = verifyToken(token);
+    console.log(payload, "i am the payload");
     (req as any).user = {};
     (req as any).user.id = payload.id;
     next();
