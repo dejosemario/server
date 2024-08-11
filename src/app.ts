@@ -26,7 +26,7 @@ class EventfulApp {
   }
 
   private initializeMiddlewares() {
-    // Enable Cross Origin Resource Sharing
+    // // Enable Cross Origin Resource Sharing
     // const corsOptions = {
     //   origin: process.env.FRONTEND_URL,
     //   credentials: true,

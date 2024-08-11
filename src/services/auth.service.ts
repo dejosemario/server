@@ -1,6 +1,5 @@
 import User from "../models/users.model";
 import { hashPassword, comparePassword, generateToken } from "../utils";
-import SendResponse from "../utils/sendResponse";
 
 export default class AuthService {
   async getUserByEmail(email: string) {

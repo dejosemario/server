@@ -27,11 +27,6 @@ const userSchema  = new Schema<UserDocument>(
       type: String,
       default: "",
     },
-    // isAdmin: {
-    //   type: Boolean,
-    //   default: false,
-    //   required: false,
-    // },
     role: {
       type: String,
       enum: ["creator", "eventee"],

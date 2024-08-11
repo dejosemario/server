@@ -28,7 +28,12 @@ export class AuthController extends BaseController {
     const { email, password } = req.body;
     const { token, user } = await this.authService.login(email, password);
     if (user) {
-      res.cookie(this.tokenName, token, { httpOnly: true });
+      res.cookie(this.tokenName, token, {
+        maxAge: 3600000,
+        httpOnly: false,
+        secure: true,
+        sameSite: "lax",
+      });
       return this.success(res, 200, "login successful", user);
     }
     this.error(res, error.message || "Internal Error", error.statusCode || 500);

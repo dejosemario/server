@@ -7,6 +7,7 @@ export default class BaseController  extends SendResponse {
   protected validate(schema: any, data: any) {
     const { error } = schema.validate(data);
     if (error) {
+      console.error('Validation Error Details:', error);
       return error.details[0].message.replace(/["]/g, "");
     }
     return null;
