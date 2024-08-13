@@ -1,3 +1,4 @@
+import { start } from "repl";
 import Event, { EventDocument } from "../models/events.model";
 
 export default class EventService {
@@ -18,12 +19,21 @@ export default class EventService {
     return newEvent;
   }
 
-  public async getAllEvents() {
-    const events = await Event.find();
+  public async getAllEvents({ searchText = '', startDate, endDate }: { searchText?: string; startDate?: Date; endDate?: Date }) {
+    const searchRegex = new RegExp(searchText, "i");  
+   
+    const start = startDate ? new Date(startDate) : new Date(0); 
+    const end = endDate ? new Date(endDate) : new Date(); 
+    // const events = await Event.find({
+    //     name: { $regex: searchRegex },
+    //     startDate: { $gte: start, $lte: end },
+    //   }).sort({ createdAt: -1 });
+    
+    const events = await Event.find({}).sort({ createdAt: -1 });
     return events;
   }
-
-  public async getEvent(eventId: string) {
+  
+  public async getEventById(eventId: string) {
     const event = await Event.findById(eventId);
 
     if (!event) throw { message: "Event not found", statusCode: 404 };

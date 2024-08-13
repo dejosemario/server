@@ -46,31 +46,51 @@ export class EventController extends BaseController {
     }
 
     const data = await this.eventService.createEvent(eventData);
-    if (data) return this.success(res, 201, "Event created", data);
-    this.error(res, 500, "Internal Error");
+    try{
+        if (data) return this.success(res, 201, "Event created", data);
+    }
+    catch(error: any){
+        console.log('Error:', error);
+        error.statusCode = 500; // You can use different status codes based on the error
+        error.message = 'Error creating event: ' + error.message;
+    }
+    
+    
   };
 
   public getEvents = async (req: Request, res: Response) => {
-    const data = await this.eventService.getAllEvents();
+   const searchText = req?.query.searchText as string | undefined;
+   const startDate = req?.query.startDate as string | undefined; 
+   const endDate = req?.query.endDate as string | undefined
+
+     // Convert startDate and endDate to Date objects
+     const start = startDate ? new Date(startDate) : undefined;
+     const end = endDate ? new Date(endDate) : undefined;
+
+    const filters = { searchText, startDate: start,
+        endDate: end}; 
+    const data = await this.eventService.getAllEvents(filters);
     if (data) return this.success(res, 200, "Events fetched", data);
     this.error(res, 500, "Internal Error");
   };
 
   public getEvent = async (req: Request, res: Response) => {
     const { id } = req.params;
-    const data = await this.eventService.getEvent(id);
+    const data = await this.eventService.getEventById(id);
     if (data) return this.success(res, 200, "Event fetched", data);
     this.error(res, 404, "Event not found");
   };
 
   public updateEvent = async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const error = this.validate(updateEventSchema, req.body);
+    const { id } = req?.params;
+    console.log("I am the id before", req.body);
+    const {_id, createdAt, updatedAt, __v, ...updatedData} = req.body;
+    console.log("I am the id after", updatedData);
+    const error = this.validate(updateEventSchema, updatedData);
     if (error) {
       return this.error(res, 400, error);
     }
-
-    const data = await this.eventService.updateEvent(id, req.body);
+    const data = await this.eventService.updateEvent(id, updatedData);
     if (data) return this.success(res, 200, "Event updated", data);
     this.error(res, 500, "Internal Error");
   };

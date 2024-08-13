@@ -7,7 +7,7 @@ import {EventController} from '../controllers/event.controller';
 class EventRoutes{
     router = express.Router();
     EventController = new EventController();
-    path = "/event";
+    path = "/events";
     constructor(){
         this.initializeRoutes();
     }
@@ -24,6 +24,10 @@ class EventRoutes{
         this.router.put(
             `${this.path}/update/:id`,isAuthenticated,
             wrapper(this.EventController.updateEvent.bind(this.EventController))
+        );
+        this.router.get(
+            `${this.path}/:id`,
+            wrapper(this.EventController.getEvent.bind(this.EventController))
         );
         this.router.delete(
             `${this.path}/delete/:id`,isAuthenticated,
