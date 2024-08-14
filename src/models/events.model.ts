@@ -20,8 +20,7 @@ export interface EventDocument extends Document {
   name: string;
   description: string;
   organizer: string;
-  startDate: Date;
-  endDate?: Date;
+  date: Date;
   time: string;
   address: string;
   city: string;
@@ -47,7 +46,7 @@ const eventSchema = new Schema<EventDocument>(
       type: String,
       required: true,
     },    
-    startDate: {
+    date: {
       type: Date,
       required: true,
       validate: [
@@ -56,16 +55,6 @@ const eventSchema = new Schema<EventDocument>(
         },
         "Date must be in the future",
       ],
-    },
-    endDate: {
-      type: Date,
-      required: false,
-      validate: [
-        function (this: EventDocument,date: Date) {
-          return this.startDate ? date > this.startDate : true; // Custom validator for future dates
-        },
-        "End date must be after start date",
-      ]
     },
     time: {
       type: String,

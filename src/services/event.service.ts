@@ -19,14 +19,13 @@ export default class EventService {
     return newEvent;
   }
 
-  public async getAllEvents({ searchText = '', startDate, endDate }: { searchText?: string; startDate?: Date; endDate?: Date }) {
+  public async getAllEvents({ searchText = '', date }: { searchText?: string; date?: Date;}) {
     const searchRegex = new RegExp(searchText, "i");  
    
-    const start = startDate ? new Date(startDate) : new Date(0); 
-    const end = endDate ? new Date(endDate) : new Date(); 
+    const start = date ? new Date(date) : new Date(0); 
     // const events = await Event.find({
     //     name: { $regex: searchRegex },
-    //     startDate: { $gte: start, $lte: end },
+    //     date: { $gte: start, $lte: end },
     //   }).sort({ createdAt: -1 });
     
     const events = await Event.find({}).sort({ createdAt: -1 });

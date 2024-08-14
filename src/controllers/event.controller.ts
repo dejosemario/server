@@ -33,7 +33,7 @@ export class EventController extends BaseController {
     // Check for duplicate event
     const existingEvent = await this.eventService.findEvent({
       title: eventData.title,
-      startDate: eventData.startDate,
+      date: eventData.date,
       location: eventData.location,
     });
 
@@ -60,15 +60,12 @@ export class EventController extends BaseController {
 
   public getEvents = async (req: Request, res: Response) => {
    const searchText = req?.query.searchText as string | undefined;
-   const startDate = req?.query.startDate as string | undefined; 
-   const endDate = req?.query.endDate as string | undefined
+   const date = req?.query.date as string | undefined; 
 
-     // Convert startDate and endDate to Date objects
-     const start = startDate ? new Date(startDate) : undefined;
-     const end = endDate ? new Date(endDate) : undefined;
+     // Convert date to Date objects
+     const start = date ? new Date(date) : undefined;
 
-    const filters = { searchText, startDate: start,
-        endDate: end}; 
+    const filters = { searchText, date:start };
     const data = await this.eventService.getAllEvents(filters);
     if (data) return this.success(res, 200, "Events fetched", data);
     this.error(res, 500, "Internal Error");
