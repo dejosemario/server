@@ -4,7 +4,7 @@
   "description": "",
   "main": "build/server.js",
   "scripts": {
-    "build": "tsc", 
+    "build": "tsc && ls dist", 
     "start": "set NODE_ENV=production && node build/server.js",
     "dev": "set NODE_ENV=production && nodemon --exec ts-node src/server.ts --trace-warnings",
     "setup": "npm install",
