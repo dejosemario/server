@@ -4,7 +4,8 @@
   "description": "",
   "main": "build/server.js",
   "scripts": {
-    "start": "NODE_ENV=production node build/server.js",
+    "build": "tsc", 
+    "start": "set NODE_ENV=production && node build/server.js",
     "dev": "set NODE_ENV=production && nodemon --exec ts-node src/server.ts --trace-warnings",
     "setup": "npm install",
     "test": "echo \"Error: no test specified\" && exit 1"
