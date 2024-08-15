@@ -21,14 +21,12 @@ export default class EventService {
 
   public async getAllEvents({ searchText = '', date }: { searchText?: string; date?: Date;}) {
     const searchRegex = new RegExp(searchText, "i");     
-    const start = date ? new Date(date) : new Date(0); 
     const events = await Event.find({
         name: { $regex: searchRegex },
         ...(date && { date }),
       }).sort({ createdAt: -1 });
       console.log('I am Events:', events);
     
-    // const events = await Event.find({}).sort({ createdAt: -1 });
     return events;
   }
   

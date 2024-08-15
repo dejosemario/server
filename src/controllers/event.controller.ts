@@ -80,9 +80,7 @@ export class EventController extends BaseController {
 
   public updateEvent = async (req: Request, res: Response) => {
     const { id } = req?.params;
-    console.log("I am the id before", req.body);
     const {_id, createdAt, updatedAt, __v, ...updatedData} = req.body;
-    console.log("I am the id after", updatedData);
     const error = this.validate(updateEventSchema, updatedData);
     if (error) {
       return this.error(res, 400, error);

@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema } from "mongoose";
 
 // Define the ticket type schema
-const ticketTypeSchema = new Schema({
+export const ticketTypeSchema = new Schema({
   name: {
     type: String,
     required: true,

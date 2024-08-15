@@ -6,7 +6,7 @@ const objectIdPattern = /^[0-9a-fA-F]{24}$/;
 const ticketTypeSchema = Joi.object({
   name: Joi.string().min(1).required(), // e.g., 'VIP'
   price: Joi.number().positive().required(), // e.g., 300
-  limit: Joi.number().integer().positive().required() // e.g., 40
+  limit: Joi.number().integer().positive().required(), // e.g., 40
 });
 
 // USER SCHEMAS
@@ -36,8 +36,7 @@ export const eventSchema = Joi.object({
   address: Joi.string().min(2).required(),
   city: Joi.string().min(2).required(),
   state: Joi.string().min(2).required(),
-  ticketTypes: Joi.array().items(ticketTypeSchema)
-  
+  ticketTypes: Joi.array().items(ticketTypeSchema),
 });
 
 export const updateEventSchema = Joi.object({
@@ -52,6 +51,15 @@ export const updateEventSchema = Joi.object({
   city: Joi.string().min(2),
   state: Joi.string().min(2),
   ticketTypes: Joi.array().items(ticketTypeSchema),
-  creator: Joi.string().pattern(objectIdPattern), 
+  creator: Joi.string().pattern(objectIdPattern),
+});
 
+export const bookingSchema = Joi.object({
+  ticketTypes: Joi.array().items(ticketTypeSchema).default([]),
+  ticketsCount: Joi.number().required(),
+  totalAmount: Joi.number().required(),
+  paymentId: Joi.string().required(),
+  status: Joi.string()
+    .valid("booked", "cancelled", "completed")
+    .default("booked"),
 });
