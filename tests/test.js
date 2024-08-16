@@ -7,8 +7,7 @@ dotenv.config();
 
 describe('AUTHENTICATION TESTS', () => {
   const userData = {
-    first_name: 'Scott',
-    last_name: 'Jones',
+    name: 'Jones Ike',
     email: 'testuser@mail.com',
     password: 'password123',
   };
@@ -25,8 +24,7 @@ describe('AUTHENTICATION TESTS', () => {
   describe('POST /api/auth/register', () => {
     it('should return 422 if invalid/missing input', async () => {
       const response = await request(app).post('/api/auth/register').send({
-        first_name: 'Scott',
-        last_name: 'Jones',
+        name: 'Jones Ike',
         email: 'testuser@mail.com',
       });
       expect(response.status).toBe(422);
@@ -47,8 +45,7 @@ describe('AUTHENTICATION TESTS', () => {
 
     it('should return 409 if user email already exists', async () => {
       const response = await request(app).post('/api/auth/register').send({
-        first_name: 'Anonymous',
-        last_name: 'User',
+        name: 'User',
         email: userData.email,
         password: 'password123',
       });
