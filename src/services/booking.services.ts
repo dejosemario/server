@@ -6,6 +6,7 @@ import { ObjectId } from "mongoose";
 
 class BookingService {
   public async createBooking(user: ObjectId, bookingData: any) {
+    console.log("bookingData", bookingData.user);
     bookingData.user = user;
 
     // Create booking
@@ -58,6 +59,7 @@ class BookingService {
 
   public async getAllBookings() {
     const bookings = await BookingModel.find().populate("event").populate("user").sort({ createdAt: -1 });
+    console.log(bookings, " ai I am all the bookings ")
     return bookings;
   }
 

@@ -56,6 +56,7 @@ export const wrapper = (fn: Function) => {
     try {
       await fn(req, res, next);
     } catch (error) {
+      console.log("chioma")
       const code = (error as any).code || 500;
       const message = (error as any).message || "Something went wrong";
       res.status(code).json({ success: false, message });

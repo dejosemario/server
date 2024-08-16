@@ -49,7 +49,6 @@ const sendEmails = async ({
 
     const info: SentMessageInfo = await transporter.sendMail(mailInfo);
     console.log("Message sent: %s", info.messageId);
-    console.log("message sent succesfully");
     // Preview only available when sending through an Ethereal account
     console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
   } catch (error) {

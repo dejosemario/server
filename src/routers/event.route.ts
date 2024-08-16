@@ -1,6 +1,6 @@
 import express from 'express';
 import {wrapper} from "../utils";
-import isAuthenticated from '../middlewares/auth';
+import isAuthenticated, { isAuthorized, isAuthUser } from '../middlewares/auth';
 import {EventController} from '../controllers/event.controller';
 
 
@@ -17,6 +17,11 @@ class EventRoutes{
             `${this.path}/all`,
             wrapper(this.EventController.getEvents.bind(this.EventController))
         );
+        this.router.get(
+            `${this.path}/creator`,isAuthUser,
+            wrapper(this.EventController.getEventsByCreator.bind(this.EventController))
+        );
+        
         this.router.post(
             `${this.path}/create`,isAuthenticated,
             wrapper(this.EventController.createEvent.bind(this.EventController))
@@ -26,7 +31,7 @@ class EventRoutes{
             wrapper(this.EventController.updateEvent.bind(this.EventController))
         );
         this.router.get(
-            `${this.path}/:id`,
+            `${this.path}/:id`,isAuthenticated, isAuthorized('event'),
             wrapper(this.EventController.getEvent.bind(this.EventController))
         );
         this.router.delete(

@@ -58,6 +58,18 @@ export class EventController extends BaseController {
     
   };
 
+  ///create get events by the creator 
+  public getEventsByCreator = async (req: Request, res: Response) => {
+    console.log("I am the creator", (req as any).user, (req as any).user?._id )
+    const userId = (req as any).user?.id;
+    if (!userId) {
+      return this.error(res, 401, "Unauthorized"); // Handle unauthorized access
+    }
+    const data = await this.eventService.getEventsByCreator(userId);
+    if (data) return this.success(res, 200, "Events fetched", data);
+    this.error(res, 500, "Internal Error");
+  };
+
   public getEvents = async (req: Request, res: Response) => {
    const searchText = req?.query.searchText as string | undefined;
    const date = req?.query.date as string | undefined; 
@@ -72,7 +84,19 @@ export class EventController extends BaseController {
   };
 
   public getEvent = async (req: Request, res: Response) => {
+
     const { id } = req.params;
+    //authenictate user to be sure he is the creator of the event
+    const userId = (req as any).user?.id;
+    console.log(userId, "yeah, you are the user Id")
+  if (!userId) {
+      return this.error(res, 401, "Unauthorized"); // Handle unauthorized access
+    }
+    // Check if the event exists
+
+
+
+
     const data = await this.eventService.getEventById(id);
     if (data) return this.success(res, 200, "Event fetched", data);
     this.error(res, 404, "Event not found");

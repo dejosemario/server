@@ -24,9 +24,17 @@ export default class EventService {
     const events = await Event.find({
         name: { $regex: searchRegex },
         ...(date && { date }),
-      }).sort({ createdAt: -1 });
-      console.log('I am Events:', events);
-    
+      }).sort({ createdAt: -1 });    
+    return events;
+  }
+
+  
+
+//create get event by creator service
+  public async getEventsByCreator(creatorId: string) {
+    const events = await Event.find({ creator: creatorId }).sort({
+      createdAt: -1,
+    });
     return events;
   }
   
