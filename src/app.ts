@@ -10,6 +10,10 @@ import routes from "./routers/index";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import morgan from "morgan";
+import { config } from 'dotenv';
+
+config();
+
 
 class EventfulApp {
   public app: Express; // Property to store the Express app instance
@@ -27,12 +31,12 @@ class EventfulApp {
 
   private initializeMiddlewares() {
     // Enable Cross Origin Resource Sharing
-    // const corsOptions = {
-    //   origin: process.env.FRONTEND_URL,
-    //   credentials: true,
-    //   optionsSuccessStatus: 200,
-    // };
-    // this.app.use(cors(corsOptions));
+    const corsOptions = {
+      origin: process.env.FRONTEND_URL,
+      credentials: true,
+      optionsSuccessStatus: 200,
+    };
+    this.app.use(cors(corsOptions));
     this.app.use(express.json());
     this.app.use(cookieParser());
     this.app.use(morgan("dev"));
@@ -68,9 +72,9 @@ class EventfulApp {
     try {
       await connectDB();
       console.log("Database connected successfully");
-
       // Start the server
       this.app.listen(this.port, "0.0.0.0", () => {
+
         console.log(`${this.appName} is running on port ${this.port}`);
       });
     } catch (error) {
