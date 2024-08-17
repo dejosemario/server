@@ -31,7 +31,7 @@ class EventRoutes{
             wrapper(this.EventController.updateEvent.bind(this.EventController))
         );
         this.router.get(
-            `${this.path}/:id`,isAuthenticated, isAuthorized('event'),
+            `${this.path}/:id`,isAuthenticated, 
             wrapper(this.EventController.getEvent.bind(this.EventController))
         );
         this.router.delete(

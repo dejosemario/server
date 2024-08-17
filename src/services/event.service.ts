@@ -27,7 +27,6 @@ export default class EventService {
       }).sort({ createdAt: -1 });    
     return events;
   }
-
   
 
 //create get event by creator service

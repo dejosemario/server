@@ -22,11 +22,10 @@ export class EventController extends BaseController {
     }
 
     // Ensure user ID is present
-    const userId = (req as any).user?.id;
+    const userId = (req as any).user?._id;
     if (!userId) {
-      return this.error(res, 401, "Unauthorized"); // Handle unauthorized access
+      return this.error(res, 401, "u"); // Handle unauthorized access
     }
-
     // Create event data with the logged-in user's ID
     const eventData = { ...req.body, creator: userId };
 
@@ -41,26 +40,17 @@ export class EventController extends BaseController {
       return this.error(
         res,
         400,
-        "Event already exists with the same title, date, and location."
+        "Event already exists with the same name, date, and location."
       );
     }
 
     const data = await this.eventService.createEvent(eventData);
-    try{
-        if (data) return this.success(res, 201, "Event created", data);
-    }
-    catch(error: any){
-        console.log('Error:', error);
-        error.statusCode = 500; // You can use different status codes based on the error
-        error.message = 'Error creating event: ' + error.message;
-    }
-    
-    
+    if (eventData) return this.success(res, 201, "Event created", data);
+    this.error(res, 500, "Internal Error");
   };
 
-  ///create get events by the creator 
+  ///create get events by the creator
   public getEventsByCreator = async (req: Request, res: Response) => {
-    console.log("I am the creator", (req as any).user, (req as any).user?._id )
     const userId = (req as any).user?.id;
     if (!userId) {
       return this.error(res, 401, "Unauthorized"); // Handle unauthorized access
@@ -71,32 +61,22 @@ export class EventController extends BaseController {
   };
 
   public getEvents = async (req: Request, res: Response) => {
-   const searchText = req?.query.searchText as string | undefined;
-   const date = req?.query.date as string | undefined; 
+    const searchText = req?.query.searchText as string | undefined;
+    const date = req?.query.date as string | undefined;
 
-     // Convert date to Date objects
-     const start = date ? new Date(date) : undefined;
+    // Convert date to Date objects
+    const start = date ? new Date(date) : undefined;
 
-    const filters = { searchText, date:start };
+    const filters = { searchText, date: start };
     const data = await this.eventService.getAllEvents(filters);
     if (data) return this.success(res, 200, "Events fetched", data);
     this.error(res, 500, "Internal Error");
   };
 
   public getEvent = async (req: Request, res: Response) => {
-
     const { id } = req.params;
     //authenictate user to be sure he is the creator of the event
     const userId = (req as any).user?.id;
-    console.log(userId, "yeah, you are the user Id")
-  if (!userId) {
-      return this.error(res, 401, "Unauthorized"); // Handle unauthorized access
-    }
-    // Check if the event exists
-
-
-
-
     const data = await this.eventService.getEventById(id);
     if (data) return this.success(res, 200, "Event fetched", data);
     this.error(res, 404, "Event not found");
@@ -104,7 +84,7 @@ export class EventController extends BaseController {
 
   public updateEvent = async (req: Request, res: Response) => {
     const { id } = req?.params;
-    const {_id, createdAt, updatedAt, __v, ...updatedData} = req.body;
+    const { _id, createdAt, updatedAt, __v, ...updatedData } = req.body;
     const error = this.validate(updateEventSchema, updatedData);
     if (error) {
       return this.error(res, 400, error);

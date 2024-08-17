@@ -24,12 +24,13 @@ const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
   const cookieName = process.env.ACCESS_TOKEN_NAME as string;
   const token = req.cookies[cookieName];
   if (!token) {
-    return res.status(401).json({ success: false, message: "Unauthorized" });
+    return res.status(401).json({ success: false, message: "Unauthorizededde" });
   }
   try {
     const payload = verifyToken(token);
+    console.log(payload, "this is the payload");
     (req as any).user = {};
-    (req as any).user._id = payload._id;
+    (req as any).user._id = payload.id;
     next();
   } catch (error) {
     return res
