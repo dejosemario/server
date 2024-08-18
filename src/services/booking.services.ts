@@ -1,12 +1,10 @@
 import BookingModel from "../models/bookings.model";
 import EventModel from "../models/events.model";
-import UserModel from "../models/users.model";
-import sendEmail from "../utils/sendEmail";
+// import UserModel from "../models/users.model";
 import { ObjectId } from "mongoose";
 
 class BookingService {
   public async createBooking(user: ObjectId, bookingData: any) {
-    console.log("bookingData", bookingData.user);
     bookingData.user = user;
 
     // Create booking
@@ -33,27 +31,29 @@ class BookingService {
       ticketTypes: updatedTicketTypes,
     });
 
-    // Send email
-    const userObj = await UserModel.findById(user);
-    if (!userObj) {
-      throw new Error("User not found");
-    }
-    const emailPayload = {
-      email: userObj.email,
-      subject: "Booking Confirmation - Eventful",
-      text: `You have successfully booked ${bookingData.ticketsCount} ticket(s) for ${event.name}.`,
-      html: "",
-    };
+    // // Send email
+    // const userObj = await UserModel.findById(user);
+    // if (!userObj) {
+    //   throw new Error("User not found");
+    // }
+    // const emailPayload = {
+    //   email: userObj.email,
+    //   subject: "Booking Confirmation - Eventful",
+    //   text: `You have successfully booked ${bookingData.ticketsCount} ticket(s) for ${event.name}.`,
+    //   html: "",
+    // };
 
-    await sendEmail(emailPayload);
+    // await sendEmail(emailPayload);
 
     return booking;
   }
 
-  public async getUserBookings(user: ObjectId) {
-    const bookings = await BookingModel.find({ user })
+  public async getUserBookings(userId: ObjectId) {
+    console.log(userId, " I am the user id")
+    const bookings = await BookingModel.find({ user: userId })
       .populate("event")
       .sort({ createdAt: -1 });
+    console.log(bookings, " I am the boking")
     return bookings
   }
 

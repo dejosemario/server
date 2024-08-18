@@ -1,6 +1,6 @@
 import express from 'express';
 import {wrapper} from "../utils";
-import isAuthenticated from '../middlewares/auth';
+import isAuthenticated, { isAuthUser } from '../middlewares/auth';
 import {BookingController} from '../controllers/booking.controller';
 
 class BookingRoutes{
@@ -15,12 +15,12 @@ class BookingRoutes{
     private initializeRoutes(){
         this.router.post(
             `${this.path}/create-booking`,
-            isAuthenticated,
+            isAuthUser,
             wrapper(this.BookingController.createBookings.bind(this.BookingController))
         )
         this.router.get(
             `${this.path}/get-user-bookings`,
-            isAuthenticated,
+            isAuthUser,
             wrapper(this.BookingController.getUserBookings.bind(this.BookingController))
         )
         this.router.get(

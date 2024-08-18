@@ -3,7 +3,6 @@ import AuthService from "../services/auth.service";
 import BaseController from "./base.controller";
 import { registerSchema, loginSchema } from "../middlewares/validate.schema";
 
-
 export class AuthController extends BaseController {
   private authService: AuthService;
   private tokenName = process.env.ACCESS_TOKEN_NAME as string;
@@ -30,14 +29,29 @@ export class AuthController extends BaseController {
     const { token, user } = await this.authService.login(email, password);
     if (user) {
       res.cookie(this.tokenName, token, {
-        httpOnly: true, 
-        secure: true, 
-        sameSite: 'lax', 
+        httpOnly: true,
+        secure: true,
+        sameSite: "lax",
         maxAge: 3600000, // 1 hour
-        path: '/', // Accessible from the root
+        path: "/", // Accessible from the root
       });
-      return this.success(res, 200, "login successful",  user );
+      return this.success(res, 200, "login successful", user);
     }
     this.error(res, error.message || "Internal Error", error.statusCode || 500);
+  };
+
+  public refreshToken = async (req: Request, res: Response) => {
+    const token = req.cookies[this.tokenName];
+    if (!token) return this.error(res, 401, "Unauthorized");
+    const newToken = await this.authService.refreshToken(token);
+    if (newToken !== undefined && newToken !== null) {
+      res.cookie(this.tokenName, newToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "lax",
+        maxAge: 3600000, // 1 hour
+      });
+      return this.success(res, 200, "Token refreshed successfully", newToken);
+    }
   };
 }

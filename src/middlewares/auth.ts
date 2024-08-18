@@ -2,23 +2,48 @@ import { NextFunction, Request, Response } from "express";
 import { verifyToken } from "../utils";
 import EventModel from "../models/events.model";
 
+// export const isAuthUser = (req: Request, res: Response, next: NextFunction) => {
+//   const cookieName = process.env.ACCESS_TOKEN_NAME as string;
+//   const token = req.cookies[cookieName];
+//   if (!token) {
+//     return res.status(403).json({ success: false, message: "Unauthorized" });
+//   }
+//   try {
+//     const payload = verifyToken(token);
+//     (req as any).user = {};
+//     (req as any).user = payload;
+//     console.log(payload, (req as any).user, "We dey here o");
+//     next();
+//   } catch (error) {
+//     return res
+//       .status(401)
+//       .json({ success: false, message: "Invalid or expired OTP code" });
+//   }
+// };
+
 export const isAuthUser = (req: Request, res: Response, next: NextFunction) => {
   const cookieName = process.env.ACCESS_TOKEN_NAME as string;
   const token = req.cookies[cookieName];
+
   if (!token) {
+    console.log("No token found in cookies");
     return res.status(403).json({ success: false, message: "Unauthorized" });
   }
+
   try {
     const payload = verifyToken(token);
-    (req as any).user = {};
-    (req as any).user = payload;
+    (req as any).user= payload; // Ensure req.user is set correctly
+
+    console.log("Token verified, user:", (req as any).user);
     next();
   } catch (error) {
+    console.error("Token verification failed:", error);
     return res
       .status(401)
-      .json({ success: false, message: "Invalid or expired OTP code" });
+      .json({ success: false, message: "Invalid or expired token" });
   }
 };
+
 
 const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
   const cookieName = process.env.ACCESS_TOKEN_NAME as string;

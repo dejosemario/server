@@ -28,4 +28,8 @@ export default class AuthService {
     const token = generateToken({ id: user._id, name: user.name });
     return { token, user: user.toJSON() };
   }
+
+  public async refreshToken(refreshToken: string) {
+    return refreshToken;
+  }
 }

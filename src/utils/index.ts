@@ -56,7 +56,18 @@ export const wrapper = (fn: Function) => {
     try {
       await fn(req, res, next);
     } catch (error) {
-      console.log("chioma")
+      console.error("Wrapper Error:", {
+        message: (error as any).message || "Something went wrong",
+        stack: (error as any).stack,
+        code: (error as any).code || 500,
+        method: req.method,
+        url: req.originalUrl,
+        body: req.body,
+        params: req.params,
+        query: req.query,
+        user: (req as any).user,
+      });
+      
       const code = (error as any).code || 500;
       const message = (error as any).message || "Something went wrong";
       res.status(code).json({ success: false, message });
