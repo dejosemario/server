@@ -31,7 +31,7 @@ export class AuthController extends BaseController {
       res.cookie(this.tokenName, token, {
         httpOnly: true,
         secure: true,
-        sameSite: "lax",
+        sameSite: "strict",
         maxAge: 3600000, // 1 hour
         path: "/", // Accessible from the root
       });
