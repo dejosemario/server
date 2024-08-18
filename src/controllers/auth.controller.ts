@@ -33,7 +33,6 @@ export class AuthController extends BaseController {
         secure: true,
         sameSite: "strict",
         maxAge: 3600000, // 1 hour
-        path: "/", // Accessible from the root
       });
       return this.success(res, 200, "login successful", user);
     }
