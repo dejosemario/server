@@ -3,6 +3,7 @@ import AuthService from "../services/auth.service";
 import BaseController from "./base.controller";
 import { registerSchema, loginSchema } from "../middlewares/validate.schema";
 
+
 export class AuthController extends BaseController {
   private authService: AuthService;
   private tokenName = process.env.ACCESS_TOKEN_NAME as string;
@@ -30,7 +31,7 @@ export class AuthController extends BaseController {
     if (user) {
       res.cookie(this.tokenName, token, {
         httpOnly: true, 
-        secure: process.env.NODE_ENV === 'production', 
+        secure: true, 
         sameSite: 'lax', 
         maxAge: 3600000, // 1 hour
         path: '/', // Accessible from the root
