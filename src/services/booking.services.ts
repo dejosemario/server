@@ -49,24 +49,22 @@ class BookingService {
   }
 
   public async getUserBookings(userId: ObjectId) {
-    console.log(userId, " I am the user id")
     const bookings = await BookingModel.find({ user: userId })
       .populate("event")
       .sort({ createdAt: -1 });
-    console.log(bookings, " I am the boking")
-    return bookings
-  }
-
-  public async getAllBookings() {
-    const bookings = await BookingModel.find().populate("event").populate("user").sort({ createdAt: -1 });
-    console.log(bookings, " ai I am all the bookings ")
     return bookings;
   }
 
-    public async cancelBooking(user: ObjectId, bookingId: ObjectId) {
-        const booking = console.log("emeka")
-    }
+  public async getAllBookings() {
+    const bookings = await BookingModel.find()
+      .populate("event")
+      .populate("user")
+      .sort({ createdAt: -1 });
+  }
 
+  public async cancelBooking(user: ObjectId, bookingId: ObjectId) {
+    const booking = console.log("emeka");
+  }
 }
 
 export default BookingService;

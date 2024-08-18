@@ -10,6 +10,7 @@ export default class UserController extends BaseController {
   }
 
   async getUser(req: Request, res: Response): Promise<any> {
+    console.log( (req as any).user?._id);
     const userId = (req as any).user?._id;
     console.log(userId)
     const data = await this.userService.findById(userId);

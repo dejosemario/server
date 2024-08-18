@@ -56,7 +56,6 @@ export class EventController extends BaseController {
       return this.error(res, 401, "Unauthorized"); // Handle unauthorized access
     }
     const data = await this.eventService.getEventsByCreator(userId);
-    console.log(data)
     if (data) return this.success(res, 200, "Events fetched", data);
     this.error(res, 500, "Internal Error");
   };
