@@ -10,7 +10,8 @@ export default class UserController extends BaseController {
   }
 
   async getUser(req: Request, res: Response): Promise<any> {
-    const userId = (req as any).user._id;
+    const userId = (req as any).user?._id;
+    console.log(userId)
     const data = await this.userService.findById(userId);
     if (!data) return this.error(res, 404, "Can not retrieve User");
     return this.success(res, 200, "User fetched successfully", data);

@@ -51,11 +51,12 @@ export class EventController extends BaseController {
 
   ///create get events by the creator
   public getEventsByCreator = async (req: Request, res: Response) => {
-    const userId = (req as any).user?. id;
+    const userId = (req as any).user?.id;
     if (!userId) {
       return this.error(res, 401, "Unauthorized"); // Handle unauthorized access
     }
     const data = await this.eventService.getEventsByCreator(userId);
+    console.log(data)
     if (data) return this.success(res, 200, "Events fetched", data);
     this.error(res, 500, "Internal Error");
   };
