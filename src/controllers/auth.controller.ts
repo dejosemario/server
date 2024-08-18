@@ -29,10 +29,11 @@ export class AuthController extends BaseController {
     const { token, user } = await this.authService.login(email, password);
     if (user) {
       res.cookie(this.tokenName, token, {
-        maxAge: 3600000,
-        httpOnly: true,
+        httpOnly: true, 
         secure: process.env.NODE_ENV === 'production', 
-        sameSite: "lax",
+        sameSite: 'lax', 
+        maxAge: 3600000, // 1 hour
+        path: '/', // Accessible from the root
       });
       return this.success(res, 200, "login successful",  user );
     }
