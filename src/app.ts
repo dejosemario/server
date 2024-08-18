@@ -36,6 +36,10 @@ class EventfulApp {
       credentials: true,
       optionsSuccessStatus: 200,
     };
+    this.app.use((req: Request, res: Response, next: NextFunction) => {
+      res.header('Access-Control-Allow-Credentials', 'true');
+      next();
+    });  
     this.app.use(cors(corsOptions));
     this.app.use(express.json());
     this.app.use(cookieParser());
