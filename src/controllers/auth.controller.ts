@@ -53,4 +53,10 @@ export class AuthController extends BaseController {
       return this.success(res, 200, "Token refreshed successfully", newToken);
     }
   };
+
+  async logout(req: Request, res: Response): Promise<any> {
+    // Clear the HTTP-only cookie
+    res.clearCookie(this.tokenName);  
+    return this.success(res, 200, "Logged out successfully");
+  }
 }

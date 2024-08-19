@@ -6,4 +6,15 @@ export default class UserService {
     if (!user) throw { message: "User not founddd", statusCode: 404 };
     return user;
   }
+
+  public async updateUserRole(userId: string, newRole: string) {
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { role: newRole },
+      { new: true }
+    ).select("-password");
+    if (!user) throw { message: "User not found", statusCode: 404 };
+    console.log("oya show the update", user)
+    return user;
+  }
 }

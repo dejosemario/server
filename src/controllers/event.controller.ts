@@ -29,21 +29,6 @@ export class EventController extends BaseController {
     // Create event data with the logged-in user's ID
     const eventData = { ...req.body, creator: userId };
 
-    // Check for duplicate event
-    const existingEvent = await this.eventService.findEvent({
-      title: eventData.title,
-      date: eventData.date,
-      location: eventData.location,
-    });
-
-    if (existingEvent) {
-      return this.error(
-        res,
-        400,
-        "Event already exists with the same name, date, and location."
-      );
-    }
-
     const data = await this.eventService.createEvent(eventData);
     if (eventData) return this.success(res, 201, "Event created", data);
     this.error(res, 500, "Internal Error");

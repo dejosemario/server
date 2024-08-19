@@ -7,7 +7,6 @@ export const isAuthUser = (req: Request, res: Response, next: NextFunction) => {
   const token = req.cookies[cookieName];
 
   if (!token) {
-    console.log("No token found in cookies");
     return res.status(403).json({ success: false, message: "Unauthorized" });
   }
 

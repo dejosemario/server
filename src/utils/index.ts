@@ -4,7 +4,7 @@ import { Request, Response, NextFunction } from "express";
 // import { config } from "dotenv";
 // config();
 
-const secretKey = process.env.JWT_SECRET_KEY as string ?? "secret_key" ;
+const secretKey = (process.env.JWT_SECRET_KEY as string) ?? "secret_key";
 
 //Function to generate a random id
 export const generateId = (length: number = 5): string => {
@@ -67,7 +67,7 @@ export const wrapper = (fn: Function) => {
         query: req.query,
         user: (req as any).user,
       });
-      
+
       const code = (error as any).code || 500;
       const message = (error as any).message || "Something went wrong";
       res.status(code).json({ success: false, message });

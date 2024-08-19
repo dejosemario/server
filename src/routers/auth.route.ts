@@ -26,6 +26,10 @@ class AuthRoutes {
       `${this.path}/refresh-token`,
       wrapper(this.AuthController.refreshToken.bind(this.AuthController))
     );
+    this.router.post(
+      `${this.path}/logout`,
+      wrapper(this.AuthController.logout.bind(this.AuthController))
+    );
   }
 }
 

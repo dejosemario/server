@@ -14,9 +14,15 @@ class UserRoutes {
 
   private initailizeRoutes() {
     this.router.get(
-      `${this.path}/me`,
+    `${this.path}/me`,
       isAuthenticated,
       wrapper(this.UserController.getUser.bind(this.UserController))
+    );
+    
+    this.router.patch(
+      `${this.path}/update-role`,
+      isAuthenticated,
+      wrapper(this.UserController.updateUserRole.bind(this.UserController))
     );
   }
 }
