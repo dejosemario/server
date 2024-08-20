@@ -1,11 +1,11 @@
 import * as redis from "redis";
 import { RedisClientType } from "redis";
 import { Request } from "express";
+import dotenv from "dotenv";
+dotenv.config();
 
 const redisClient: RedisClientType = redis.createClient({
-  // url: 'redis://red-cquav0bqf0us73a9687g:6379',
-  // url: "rediss://red-cquav0bqf0us73a9687g:zSNyQ0hBDkQqmlv5xS6fQpetDnu1b0PK@oregon-redis.render.com:6379"
-  url: "redis://localhost:6379",
+  url: process.env.NODE_ENV === "production" ? process.env.REDIS_URL : "redis://localhost:6379",
 });
 
 redisClient.on("connect", () => {
