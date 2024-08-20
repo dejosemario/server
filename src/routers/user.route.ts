@@ -1,12 +1,12 @@
 import express, { Router } from "express";
 import { wrapper } from "../utils";
-import isAuthenticated from "../middlewares/auth";
+import isAuthenticated, { cacheMiddleware } from "../middlewares/auth";
 import UserController from "../controllers/user.controller";
 
 class UserRoutes {
   router = express.Router();
   UserController = new UserController();
-  path="/user";
+  path = "/user";
 
   constructor() {
     this.initailizeRoutes();
@@ -14,11 +14,12 @@ class UserRoutes {
 
   private initailizeRoutes() {
     this.router.get(
-    `${this.path}/me`,
+      `${this.path}/me`,
+      cacheMiddleware,
       isAuthenticated,
       wrapper(this.UserController.getUser.bind(this.UserController))
     );
-    
+
     this.router.patch(
       `${this.path}/update-role`,
       isAuthenticated,

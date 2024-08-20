@@ -1,6 +1,6 @@
 import express from 'express';
 import {wrapper} from "../utils";
-import isAuthenticated, { isAuthUser } from '../middlewares/auth';
+import isAuthenticated, { cacheMiddleware, isAuthUser } from '../middlewares/auth';
 import {BookingController} from '../controllers/booking.controller';
 
 class BookingRoutes{
@@ -25,6 +25,7 @@ class BookingRoutes{
         )
         this.router.get(
             `${this.path}/get-all-bookings`,
+            cacheMiddleware,
             isAuthenticated,
             wrapper(this.BookingController.getAllBookings.bind(this.BookingController))
         ),

@@ -11,6 +11,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import morgan from "morgan";
 import { config } from "dotenv";
+import rateLimit from "express-rate-limit";
 
 config();
 
@@ -42,8 +43,17 @@ class EventfulApp {
     this.app.use(cors(corsOptions));
     this.app.use(express.json());
     this.app.use(cookieParser());
-    this.app.use(morgan("dev"));
     this.app.use(express.urlencoded({ extended: true }));
+
+    const limiter = rateLimit({
+      windowMs: 15 * 60 * 1000, // 15 minutes
+      max: 3, // limit each IP to 100 requests per windowMs
+      message:
+        "Too many requests from this IP, please try again after 15 minutes",
+    });
+    // this.app.use(limiter);
+    this.app.use(morgan("dev"));
+
   }
 
   private initializeRoutes(routes: Router[]) {

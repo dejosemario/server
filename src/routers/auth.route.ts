@@ -1,7 +1,7 @@
 import express from "express";
 import { wrapper } from "../utils";
 import { AuthController } from "../controllers/auth.controller";
-import isAuthenticated from "../middlewares/auth";
+import { cacheMiddleware } from "../middlewares/auth";
 
 class AuthRoutes {
   // Create an instance of AuthController
@@ -23,7 +23,7 @@ class AuthRoutes {
       wrapper(this.AuthController.login.bind(this.AuthController))
     );
     this.router.post(
-      `${this.path}/refresh-token`,
+      `${this.path}/refresh-token`,cacheMiddleware,
       wrapper(this.AuthController.refreshToken.bind(this.AuthController))
     );
     this.router.post(

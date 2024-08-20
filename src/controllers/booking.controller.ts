@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import BookingService from "../services/booking.services";
 import BaseController from "./base.controller";
+import redisClient from "../integrations/redis";
 // import { bookingSchema } from "../middlewares/validate.schema";
 
 export class BookingController extends BaseController {
@@ -11,7 +12,7 @@ export class BookingController extends BaseController {
     this.bookingService = new BookingService();
   }
   public createBookings = async (req: Request, res: Response) => {
-    req.body.user = (req as any).user;    
+    req.body.user = (req as any).user;
     if (!(req as any).user || !(req as any).user.id) {
       return res.status(401).json({ message: "Unauthorized" });
     }
@@ -24,23 +25,25 @@ export class BookingController extends BaseController {
   };
 
   public getUserBookings = async (req: Request, res: Response) => {
-     req.body.user = (req as any).user;
+    req.body.user = (req as any).user;
     if (!(req as any).user || !(req as any).user.id) {
       return res.status(401).json({ message: "Unauthorized" });
     }
-
     const bookings = await this.bookingService.getUserBookings(
       (req as any).user.id
     );
+    redisClient.setEx("userBooking", 12 * 60 * 60, JSON.stringify(bookings));
+
     return res.status(200).json({ bookings });
   };
 
   public getAllBookings = async (req: Request, res: Response) => {
     if (!(req as any).user || !(req as any).user.id) {
-       return res.status(401).json({ message: "Unauthorized" });
+      return res.status(401).json({ message: "Unauthorized" });
     }
 
     const bookings = await this.bookingService.getAllBookings();
+    redisClient.setEx("GetAllBookings", 12 * 60 * 60, JSON.stringify(bookings));
     return res.status(200).json({ bookings });
   };
 

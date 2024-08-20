@@ -1,6 +1,7 @@
 import BaseController from "./base.controller";
 import UserService from "../services/user.service";
 import { Request, Response } from "express"; // Import the Request and Response types from "express"
+import redisClient from "../integrations/redis";
 
 export default class UserController extends BaseController {
   private userService: UserService;
@@ -16,15 +17,18 @@ export default class UserController extends BaseController {
     const userId = (req as any).user?._id;
     console.log(userId);
     const data = await this.userService.findById(userId);
+    redisClient.setEx("user", 12 * 60 * 60, JSON.stringify(data));
     if (!data) return this.error(res, 404, "Can not retrieve User");
     return this.success(res, 200, "User fetched successfully", data);
   }
 
   async updateUserRole(
-    req: Request<{}, {},  { role: { role: string } }>,
+    req: Request<{}, {}, { role: { role: string } }>,
     res: Response
   ): Promise<any> {
-    const { role: { role } } = req.body;
+    const {
+      role: { role },
+    } = req.body;
     const userId = (req as any).user?._id;
     // validate the new role
     const user = await this.userService.findById(userId);
