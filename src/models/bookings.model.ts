@@ -10,6 +10,9 @@ export interface BookingDocument extends Document {
     totalAmount: number;
     paymentId: string;
     status: string;
+    qrCode?: {
+      url: string;
+    };
   }
 
 const bookingSchema = new Schema<BookingDocument>(
@@ -45,6 +48,11 @@ const bookingSchema = new Schema<BookingDocument>(
         type: String,
         required: true,
         default: "booked",
+        enum: ["booked", "cancelled", "completed"], 
+      },
+      qrCode: {
+        url: String,
+        required: false,
       },
     },
     { timestamps: true }

@@ -12,3 +12,5 @@ build/
 
 # Temporary files
 *.tmp
+
+*./config/eventful-eb4ee-firebase-adminsdk-l20qb-1afe6a7124.json

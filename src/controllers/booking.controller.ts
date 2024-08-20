@@ -58,4 +58,16 @@ export class BookingController extends BaseController {
     );
     return res.status(200).json({ booking });
   };
+
+  public generateQRCode = async (req: Request, res: Response) => {
+    if (!(req as any).user || !(req as any).user.id) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const qrCode = await this.bookingService.QRCode(
+      (req as any).user.id,
+      req.body.bookingId
+    );
+    return res.status(200).json({ qrCode });
+  };
 }

@@ -33,6 +33,11 @@ class BookingRoutes{
             `${this.path}/cancel-booking`,
             isAuthenticated,
             wrapper(this.BookingController.getUserBookings.bind(this.BookingController))
+        ),
+        this.router.post(
+            `${this.path}/generate-qrcode`,
+            isAuthenticated,
+            wrapper(this.BookingController.generateQRCode.bind(this.BookingController
         )
         
         
