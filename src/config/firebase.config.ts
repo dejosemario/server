@@ -18,15 +18,6 @@ const serviceAccount =
 let credential;
 
 if (process.env.NODE_ENV === "production") {
-  // In production, serviceAccount is expected to be a JSON string
-  if (process.env.FIREBASE_SERVICE_ACCOUNT) {
-    credential = admin.credential.cert(
-      JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
-    );
-  } else {
-    throw new Error("Firebase service account is not defined.");
-  }
-} else {
   if (serviceAccount) {
     if (fs.existsSync(serviceAccount)) {
       const serviceAccountJson = JSON.parse(
@@ -39,6 +30,22 @@ if (process.env.NODE_ENV === "production") {
       );
     }
   } else {
+    throw new Error("Service account path is not defined.");
+  }
+} else {
+  if (serviceAccount) {
+    // In development, use the local JSON file
+    if (fs.existsSync(serviceAccount)) {
+      const serviceAccountJson = serviceAccount
+        ? JSON.parse(fs.readFileSync(serviceAccount, "utf8"))
+        : null;
+      credential = admin.credential.cert(serviceAccountJson);
+    } else {
+      throw new Error(
+        `Service account file not found at path: ${serviceAccount}`
+      );
+    }
+  }else{
     throw new Error("Service account path is not defined.");
   }
 }
