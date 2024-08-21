@@ -3,11 +3,11 @@ import nodemailer, {
   SendMailOptions,
   SentMessageInfo,
 } from "nodemailer";
-import {config} from "dotenv";
-import { send } from "process";
+import { config } from "dotenv";
 
 // Load environment variables
 config();
+
 interface User {
   email: string;
   username: string;
@@ -20,10 +20,14 @@ interface EmailPayload {
   html: string;
 }
 
+console.log(process.env.MAIL_SENDER, "I am the mail sender");
+
 const transporter: Transporter = nodemailer.createTransport({
-  host: "smtp.ethereal.email",
-  port: 587,
-  secure: false, // Use `true` for port 465, `false` for all other ports
+  service: "gmail",
+  secure: true,
+  tls:{
+    rejectUnauthorized: false
+  },
   auth: {
     user: process.env.MAIL_SENDER,
     pass: process.env.MAIL_PASSWORD,
