@@ -1,9 +1,10 @@
 import BookingModel from "../models/bookings.model";
 import EventModel from "../models/events.model";
-// import UserModel from "../models/users.model";
+import UserModel from "../models/users.model";
 import { ObjectId } from "mongoose";
 import axios from "axios";
-import { storage } from "firebase-admin";
+import sendEmails  from "../utils/sendEmail";
+// import { storage } from "firebase-admin";
 import { Buffer } from "buffer";
 import { bucket } from "../config/firebase.config";
 
@@ -35,19 +36,19 @@ class BookingService {
       ticketTypes: updatedTicketTypes,
     });
 
-    // // Send email
-    // const userObj = await UserModel.findById(user);
-    // if (!userObj) {
-    //   throw new Error("User not found");
-    // }
-    // const emailPayload = {
-    //   email: userObj.email,
-    //   subject: "Booking Confirmation - Eventful",
-    //   text: `You have successfully booked ${bookingData.ticketsCount} ticket(s) for ${event.name}.`,
-    //   html: "",
-    // };
+    // Send email
+    const userObj = await UserModel.findById(user);
+    if (!userObj) {
+      throw new Error("User not found");
+    }
+    const emailPayload = {
+      email: userObj.email,
+      subject: "Booking Confirmation - Eventful",
+      text: `You have successfully booked ${bookingData.ticketsCount} ticket(s) for ${event.name}.`,
+      html: "",
+    };
 
-    // await sendEmail(emailPayload);
+    await sendEmails(emailPayload);
 
     return booking;
   }

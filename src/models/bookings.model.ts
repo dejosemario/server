@@ -52,7 +52,6 @@ const bookingSchema = new Schema<BookingDocument>(
       },
       qrCode: {
         url: String,
-        required: false,
       },
     },
     { timestamps: true }
