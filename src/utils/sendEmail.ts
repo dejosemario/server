@@ -20,7 +20,6 @@ interface EmailPayload {
   html: string;
 }
 
-console.log(process.env.MAIL_SENDER, "I am the mail sender");
 
 const transporter: Transporter = nodemailer.createTransport({
   service: "gmail",
@@ -52,11 +51,10 @@ const sendEmails = async ({
 
     const info: SentMessageInfo = await transporter.sendMail(mailInfo);
     console.log("Message sent: %s", info.messageId);
-    // Preview only available when sending through an Ethereal account
     console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
   } catch (error) {
     console.error("Error sending email:", error);
-    throw error; // Re-throw error to handle it in the calling function
+    throw error; 
   }
 };
 

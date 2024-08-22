@@ -48,15 +48,24 @@ export class BookingController extends BaseController {
   };
 
   public cancelBooking = async (req: Request, res: Response) => {
+    const { eventId, paymentId, bookingId, ticketsCount, ticketTypes } =
+      req.body;
+      console.log( eventId, paymentId, bookingId, ticketsCount, ticketTypes, "Yeahaaa")
+    req.body.user = (req as any).user;
     if (!(req as any).user || !(req as any).user.id) {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const booking = await this.bookingService.cancelBooking(
-      (req as any).user.id,
-      req.body.bookingId
+    const response = await this.bookingService.cancelBooking(
+      eventId,
+      paymentId,
+      bookingId,
+      ticketsCount,
+      ticketTypes,
+      (req as any).user.id
     );
-    return res.status(200).json({ booking });
+    if (response) return this.success(res, 200, "Booking ");
+    this.error(res, 500, "Internal Error");
   };
 
   public generateQRCode = async (req: Request, res: Response) => {
