@@ -1,14 +1,14 @@
 import BookingModel from "../models/bookings.model";
 import EventModel from "../models/events.model";
 import UserModel from "../models/users.model";
-import { ObjectId } from "mongoose";
+import mongoose, { ObjectId } from "mongoose";
 import axios from "axios";
 import sendEmails from "../utils/sendEmail";
 import { Buffer } from "buffer";
 import { Stripe } from "stripe";
 import { bucket } from "../config/firebase.config";
-import dotenv from "dotenv";
-dotenv.config();
+import { config } from "dotenv";
+config();
 
 class BookingService {
   private stripe: Stripe;
@@ -76,7 +76,7 @@ class BookingService {
       .populate("event")
       .populate("user")
       .sort({ createdAt: -1 });
-    return bookings
+    return bookings;
   }
 
   public async cancelBooking(
@@ -87,46 +87,51 @@ class BookingService {
     ticketsCount: number,
     ticketTypeName: string[]
   ) {
-    const refund = await this.stripe.refunds.create({
-      payment_intent: paymentId,
+    // const refund = await this.stripe.refunds.create({
+    //   payment_intent: paymentId,
+    // });
+
+    // if (refund.status !== "succeeded") {
+    //   throw new Error("Refund failed");
+    // }
+
+    const deletedBooking = await BookingModel.findByIdAndDelete(bookingId);
+
+    if (!deletedBooking) {
+      throw new Error("Booking not found");
+    }
+    // update event tickets
+    const event = await EventModel.findById(eventId);
+    const ticketTypes = event?.ticketTypes;
+    const updatedTicketTypes = ticketTypes?.map((ticketType: any) => {
+      if (ticketType.name === ticketTypeName) {
+        ticketType.booked =
+          Number(ticketType.booked ?? 0) - Number(ticketsCount);
+        ticketType.available =
+          Number(ticketType.available ?? ticketType.limit) +
+          Number(ticketsCount);
+      }
+
+      return ticketType;
     });
 
-    if (refund.status === "succeeded") {
-      await BookingModel.findByIdAndUpdate(bookingId, { status: "cancelled" });
+    await EventModel.findByIdAndUpdate(eventId, {
+      ticketTypes: updatedTicketTypes,
+    });
 
-      // update event tickets
-      const event = await EventModel.findById(eventId);
-      const ticketTypes = event?.ticketTypes;
-      const updatedTicketTypes = ticketTypes?.map((ticketType: any) => {
-        if (ticketType.name === ticketTypeName) {
-          ticketType.booked =
-            Number(ticketType.booked ?? 0) - Number(ticketsCount);
-          ticketType.available =
-            Number(ticketType.available ?? ticketType.limit) +
-            Number(ticketsCount);
-        }
-
-        return ticketType;
-      });
-
-      await EventModel.findByIdAndUpdate(eventId, {
-        ticketTypes: updatedTicketTypes,
-      });
-
-      const userObj = await UserModel.findById(user);
-      if (!userObj) {
-        throw new Error("User not found");
-      }
-      const emailPayload = {
-        email: userObj.email,
-        subject: "Booking Cancellation - SheyEvents",
-        text: `You have successfully cancelled your booking for ${event?.name}.`,
-        html: ``,
-      };
-
-     await sendEmails(emailPayload);
+    const userObj = await UserModel.findById(user);
+    if (!userObj) {
+      throw new Error("User not found");
     }
-    return refund;
+    const emailPayload = {
+      email: userObj.email,
+      subject: "Booking Cancellation - SheyEvents",
+      text: `You have successfully cancelled your booking for ${event?.name}.`,
+      html: ``,
+    };
+
+    const response = await sendEmails(emailPayload);
+    return response;
   }
 
   public QRCode = async (user_id: string, bookingId: string) => {

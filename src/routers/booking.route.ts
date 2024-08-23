@@ -41,7 +41,7 @@ class BookingRoutes {
         `${this.path}/cancel-booking`,
         isAuthUser,
         wrapper(
-          this.BookingController.getUserBookings.bind(this.BookingController)
+          this.BookingController.cancelBooking.bind(this.BookingController)
         )
       ),
       this.router.post(

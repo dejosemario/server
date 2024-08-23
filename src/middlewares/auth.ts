@@ -6,7 +6,6 @@ import redisClient, { getRedisKey } from "../integrations/redis";
 export const isAuthUser = (req: Request, res: Response, next: NextFunction) => {
   const cookieName = process.env.ACCESS_TOKEN_NAME as string;
   const token = req.cookies[cookieName];
-
   if (!token) {
     return res.status(403).json({ success: false, message: "Unauthorized" });
   }

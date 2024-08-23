@@ -14,7 +14,6 @@ export default class UserService {
       { new: true }
     ).select("-password");
     if (!user) throw { message: "User not found", statusCode: 404 };
-    console.log("oya show the update", user)
     return user;
   }
 }
