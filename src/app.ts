@@ -36,9 +36,15 @@ class EventfulApp {
       credentials: true,
       optionsSuccessStatus: 200,
     };
+    this.app.set("trust proxy", true); // Enable trust proxy
+
+    // Handle preflight requests
+    this.app.options("*", cors(corsOptions));
+    
+    this.app.use(cors(corsOptions));
     this.app.use((req: Request, res: Response, next: NextFunction) => {
       res.header("Access-Control-Allow-Credentials", "true");
-      res.header("Access-Control-Allow-Origin", process.env.FRONTEND_URL || '');
+      res.header("Access-Control-Allow-Origin", process.env.FRONTEND_URL || "");
       res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
       res.header(
         "Access-Control-Allow-Headers",
@@ -46,7 +52,6 @@ class EventfulApp {
       );
       next();
     });
-    this.app.use(cors(corsOptions));
     this.app.use(express.json());
     this.app.use(cookieParser());
     this.app.use(express.urlencoded({ extended: true }));
@@ -59,7 +64,6 @@ class EventfulApp {
     });
     this.app.use(limiter);
     this.app.use(morgan("dev"));
-
   }
 
   private initializeRoutes(routes: Router[]) {
