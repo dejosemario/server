@@ -31,7 +31,7 @@ export class EventController extends BaseController {
     const eventData = { ...req.body, creator: userId };
 
     const data = await this.eventService.createEvent(eventData);
-    if (eventData) return this.success(res, 201, "Event created", data);
+    if (data) return this.success(res, 201, "Event created", data);
     this.error(res, 500, "Internal Error");
   };
 

@@ -50,7 +50,7 @@ export class BookingController extends BaseController {
   public cancelBooking = async (req: Request, res: Response) => {
     const { eventId, paymentId, bookingId, ticketsCount, ticketTypes } =
       req.body;
-   const userId = (req as any).user.id;
+    const userId = (req as any).user.id;
     if (!(req as any).user || !(req as any).user.id) {
       return res.status(401).json({ message: "Unauthorized" });
     }
@@ -61,11 +61,10 @@ export class BookingController extends BaseController {
       paymentId,
       bookingId,
       ticketsCount,
-      ticketTypes,
+      ticketTypes
     );
 
-      return this.success(res, 200, "Booking cancelled successfuly ");
-    
+    return this.success(res, 200, "Booking cancelled successfuly ");
   };
 
   public generateQRCode = async (req: Request, res: Response) => {

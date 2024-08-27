@@ -1,4 +1,3 @@
-import { start } from "repl";
 import Event, { EventDocument } from "../models/events.model";
 
 export default class EventService {
