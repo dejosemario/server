@@ -31,7 +31,8 @@ class BookingService {
     if (!event) {
       throw new Error("Event not found");
     }
-    const ticketTypes = event.ticketTypes;
+
+    const ticketTypes = event.ticketTypes || [];
     const updatedTicketTypes = ticketTypes?.map((ticketType: any) => {
       if (ticketType.name === bookingData.ticketType) {
         ticketType.booked =
@@ -45,7 +46,7 @@ class BookingService {
 
     await EventModel.findByIdAndUpdate(bookingData.event, {
       ticketTypes: updatedTicketTypes,
-    });
+    });  
 
     // Send email
     const userObj = await UserModel.findById(user);

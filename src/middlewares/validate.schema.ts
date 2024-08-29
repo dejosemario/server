@@ -55,7 +55,7 @@ export const updateEventSchema = Joi.object({
 });
 
 export const bookingSchema = Joi.object({
-  ticketTypes: Joi.array().items(ticketTypeSchema).default([]),
+  ticketType: Joi.array().items(ticketTypeSchema).default([]),
   ticketsCount: Joi.number().required(),
   totalAmount: Joi.number().required(),
   paymentId: Joi.string().required(),

@@ -1,11 +1,10 @@
 import mongoose, { Document, Schema } from "mongoose";
-import { ticketTypeSchema } from "./events.model";
 
 // Define the BookingDocument interface
 export interface BookingDocument extends Document {
     event: mongoose.Types.ObjectId; // Reference to the Event
     user: mongoose.Types.ObjectId; // Reference to the User
-    ticketTypes: typeof ticketTypeSchema[];
+    ticketType: string;
     ticketsCount: number;
     totalAmount: number;
     paymentId: string;
@@ -27,10 +26,9 @@ const bookingSchema = new Schema<BookingDocument>(
         ref: "User", // Reference to the User model
         required: true,
       },
-      ticketTypes: {
-        type: [ticketTypeSchema], // Use the ticketTypeSchema here
-        required: false,
-        default: [],
+      ticketType: {
+        type: String,// Reference to ticket type
+        required: true,
       },
       ticketsCount: {
         type: Number,

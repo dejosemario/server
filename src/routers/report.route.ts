@@ -1,6 +1,6 @@
 import express from "express";
 import { wrapper } from "../utils";
-import isAuthenticated, { isAuthUser } from "../middlewares/auth";
+import { isAuthUser } from "../middlewares/auth";
 import { ReportController } from "../controllers/report.controller";
 
 class ReportRoutes {
@@ -14,7 +14,7 @@ class ReportRoutes {
   private initializeRoutes() {
     this.router.post(
       `${this.path}/get-creator-reports`,
-      isAuthenticated,
+      isAuthUser,
       wrapper(
         this.ReportController.getCreatorReports.bind(this.ReportController)
       )

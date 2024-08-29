@@ -27,7 +27,7 @@ const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
   const cookieName = process.env.ACCESS_TOKEN_NAME as string;
   const token = req.cookies[cookieName];
   if (!token) {
-    return res.status(401).json({ success: false, message: "Unauthorizedd" });
+    return res.status(401).json({ success: false, message: "Unauthorized" });
   }
   try {
     const payload = verifyToken(token);
