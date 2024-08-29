@@ -31,7 +31,7 @@ export class AuthController extends BaseController {
       res.cookie(this.tokenName, token, {
         httpOnly: true,
         secure: true,
-        sameSite: "none",
+        sameSite: "lax",
         maxAge: 3600000, // 1 hour
       });
       return this.success(res, 200, "login successful", user);
