@@ -81,12 +81,12 @@ class BookingService {
   }
 
   public async cancelBooking(
-    user: ObjectId,
     eventId: ObjectId,
-    paymentId: string,
-    bookingId: ObjectId,
+    ticketTypeName: string,
     ticketsCount: number,
-    ticketTypeName: string[]
+    bookingId: ObjectId,
+    paymentId: string,
+    user: ObjectId
   ) {
     // const refund = await this.stripe.refunds.create({
     //   payment_intent: paymentId,
@@ -112,9 +112,9 @@ class BookingService {
           Number(ticketType.available ?? ticketType.limit) +
           Number(ticketsCount);
       }
-
       return ticketType;
     });
+
 
     await EventModel.findByIdAndUpdate(eventId, {
       ticketTypes: updatedTicketTypes,

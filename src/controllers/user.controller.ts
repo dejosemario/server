@@ -44,4 +44,15 @@ export default class UserController extends BaseController {
     if (!data) return this.error(res, 400, "Can not update role");
     return this.success(res, 200, "Role updated successfully", data);
   }
+
+  async getAllAttendees(req: Request, res: Response): Promise<any> {
+    const user = (req as any).user.id;
+    if (!(req as any).user || !(req as any).user.id) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    const response = await this.userService.getAllAttendees(user);
+    if (response) {
+      return this.success(res, 200, "Attendees Fetched", response);
+    }
+  }
 }

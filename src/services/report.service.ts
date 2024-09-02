@@ -80,9 +80,9 @@ export default class ReportService {
       revenue: number;
     }[] = [];
     ticketTypesInEvent?.forEach((ticketType: any) => {
-      const bookingsWithTicketType = bookings.filter(
-        (booking: any) => booking.ticketType === ticketType.name
-      );
+      const bookingsWithTicketType = bookings.filter((booking: any) => {
+        return booking.ticketType === ticketType.name;
+      });
       ticketTypesAndThierSales.push({
         name: ticketType.name,
         ticketsSold:

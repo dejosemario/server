@@ -1,6 +1,6 @@
 import express, { Router } from "express";
 import { wrapper } from "../utils";
-import isAuthenticated, { cacheMiddleware } from "../middlewares/auth";
+import isAuthenticated, { cacheMiddleware, isAuthUser } from "../middlewares/auth";
 import UserController from "../controllers/user.controller";
 
 class UserRoutes {
@@ -24,6 +24,11 @@ class UserRoutes {
       `${this.path}/update-role`,
       isAuthenticated,
       wrapper(this.UserController.updateUserRole.bind(this.UserController))
+    );
+    this.router.get(
+      `${this.path}/attendees`,
+      isAuthUser,
+      wrapper(this.UserController.getAllAttendees.bind(this.UserController))
     );
   }
 }
