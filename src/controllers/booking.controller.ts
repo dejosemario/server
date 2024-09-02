@@ -48,7 +48,7 @@ export class BookingController extends BaseController {
   };
 
   public cancelBooking = async (req: Request, res: Response) => {
-    const { eventId, paymentId, bookingId, ticketsCount, ticketTypes } =
+    const { eventId, ticketTypeName, ticketsCount, bookingId, paymentId } =
       req.body;
     const userId = (req as any).user.id;
     if (!(req as any).user || !(req as any).user.id) {
@@ -56,12 +56,12 @@ export class BookingController extends BaseController {
     }
 
     const response = await this.bookingService.cancelBooking(
-      userId,
       eventId,
-      paymentId,
-      bookingId,
+      ticketTypeName,
       ticketsCount,
-      ticketTypes
+      bookingId,
+      paymentId,
+      userId
     );
 
     return this.success(res, 200, "Booking cancelled successfuly ");
