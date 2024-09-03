@@ -20,13 +20,18 @@ export default class ReportService {
   public async getCreatorReports(
     startDate: string,
     endDate: string,
-    eventId: string
+    eventId: string,
+    creatorId: string
+
   ) {
     let query = {};
-    if (eventId) {
+    if (!eventId) {
+      const events = await EventModel.find({ creator: creatorId }).select("_id");
+      const eventIds = events.map((event) => event._id);
+      query = { event: { $in: eventIds } };
+    } else {
       query = { event: eventId };
     }
-
     if (startDate && endDate) {
       query = {
         ...query,
@@ -100,7 +105,6 @@ export default class ReportService {
     responseObject.ticketTypesAndThierSales = ticketTypesAndThierSales;
     return responseObject;
   }
-
 
   public async getUserReports(userId: string) {
     const bookings = await BookingModel.find({ user: userId });

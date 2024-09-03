@@ -96,9 +96,9 @@ class BookingService {
     //   throw new Error("Refund failed");
     // }
 
-    const deletedBooking = await BookingModel.findByIdAndDelete(bookingId);
+    const cancelledBooking =  await BookingModel.findByIdAndUpdate(bookingId, { status: "cancelled" });
 
-    if (!deletedBooking) {
+    if (!cancelledBooking) {
       throw new Error("Booking not found");
     }
     // update event tickets

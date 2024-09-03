@@ -11,10 +11,12 @@ export class ReportController extends BaseController {
 
   public getCreatorReports = async (req: Request, res: Response) => {
     const { startDate, endDate, eventId } = req.body;
+    const creatorId = (req as any).user.id;
     const response = await this.reportService.getCreatorReports(
       startDate,
       endDate,
-      eventId
+      eventId,
+      creatorId
     );
     if (response) return this.success(res, 201, "Report fetched", response);
     this.error(res, 500, "Internal Error");
