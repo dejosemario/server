@@ -46,7 +46,7 @@ class BookingRoutes {
       ),
       this.router.post(
         `${this.path}/generate-qrcode`,
-        isAuthenticated,
+        isAuthUser,
         wrapper(
           this.BookingController.generateQRCode.bind(this.BookingController)
         )

@@ -1,7 +1,7 @@
 import BookingModel from "../models/bookings.model";
 import EventModel from "../models/events.model";
 import UserModel from "../models/users.model";
-import mongoose, { ObjectId } from "mongoose";
+import { ObjectId } from "mongoose";
 import axios from "axios";
 import sendEmails from "../utils/sendEmail";
 import { Buffer } from "buffer";
@@ -46,7 +46,7 @@ class BookingService {
 
     await EventModel.findByIdAndUpdate(bookingData.event, {
       ticketTypes: updatedTicketTypes,
-    });  
+    });
 
     // Send email
     const userObj = await UserModel.findById(user);
@@ -96,7 +96,9 @@ class BookingService {
     //   throw new Error("Refund failed");
     // }
 
-    const cancelledBooking =  await BookingModel.findByIdAndUpdate(bookingId, { status: "cancelled" });
+    const cancelledBooking = await BookingModel.findByIdAndUpdate(bookingId, {
+      status: "cancelled",
+    });
 
     if (!cancelledBooking) {
       throw new Error("Booking not found");
@@ -114,7 +116,6 @@ class BookingService {
       }
       return ticketType;
     });
-
 
     await EventModel.findByIdAndUpdate(eventId, {
       ticketTypes: updatedTicketTypes,
@@ -144,23 +145,26 @@ class BookingService {
       if (!booking) {
         throw new Error("Booking not found");
       }
-
-      if (booking.user && booking.user.toString() !== user_id) {
+      if (booking.user && booking.user.id.toString() !== user_id) {
         throw new Error("You do not have permission to perform this action");
       }
 
       const event = booking.event as any;
       if (!event) {
         throw new Error("Event not found");
-      }
+      }      
 
-      const expirationTime = new Date(
-        event.startTime.getTime() + 12 * 60 * 60 * 1000
+      const eventDateTime = new Date(
+        `${event.date.toISOString().split("T")[0]}T${event.time}`
       );
+      const expirationTime = new Date(
+        eventDateTime.getTime() + 12 * 60 * 60 * 1000
+      );
+
 
       // Generate QR code URL
       const qrCodeUrl = await this.generateQRCode(
-        `http://yourapp.com/bookings/${bookingId}`,
+        `https://de-eventful.vercel.app//events/${bookingId}`,
         expirationTime
       );
 
@@ -169,8 +173,12 @@ class BookingService {
         url: qrCodeUrl,
       };
       await booking.save();
-    } catch (error) {
-      throw new Error("Booking not found");
+      return qrCodeUrl;
+    } catch (error: any) {
+      console.error("Error in booking service:", error); // Log the actual error
+      throw new Error(
+        error?.message || "An error occurred while processing the booking"
+      );
     }
   };
 
@@ -180,41 +188,39 @@ class BookingService {
         responseType: "arraybuffer",
         params: {
           data: url,
-          size: "150x150",
+          size: "300x300",
           format: "svg",
           qzone: 2,
           color: "50-15-0",
         },
       });
-
+  
       const qrBuffer = Buffer.from(qr.data);
-
       const fileName = `qrcodes/${Date.now()}.svg`;
-
-      // Upload QR code to Firebase Storage
+  
+  
       const file = bucket.file(fileName);
-
+  
       await file.save(qrBuffer, {
         contentType: "image/svg+xml",
         public: true,
-      });
-
-      // Calculate expiration time for the signed URL
+      });  
+  
       const expirationTime = new Date(eventStartTime);
       expirationTime.setHours(expirationTime.getHours() + 12);
-
-      // Generate a signed URL for the uploaded file
+  
       const [signedUrl] = await file.getSignedUrl({
         action: "read",
         expires: expirationTime,
       });
-
-      // Return the signed URL as a string
+  
       return signedUrl;
     } catch (error: any) {
+      console.error("Error generating QR code:", error);
       throw new Error(`Error generating QR code: ${error.message}`);
     }
   }
+  
 }
 
 export default BookingService;
