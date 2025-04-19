@@ -4,8 +4,28 @@ import { Request } from "express";
 import dotenv from "dotenv";
 dotenv.config();
 
+// For debugging purposes - helps identify what URL is being used
+console.log(
+  `Redis URL being used: ${
+    process.env.NODE_ENV === "production"
+      ? "Using production REDIS_URL"
+      : "Using localhost"
+  }`
+);
+
 const redisClient: RedisClientType = redis.createClient({
-  url: process.env.NODE_ENV === "production" ? process.env.REDIS_URL : "redis://localhost:6379",
+  url:
+    process.env.NODE_ENV === "production"
+      ? process.env.REDIS_URL
+      : "redis://localhost:6379",
+  // Add socket timeout options for better error handling
+  socket: {
+    reconnectStrategy: (retries) => {
+      console.log(`Redis reconnect attempt: ${retries}`);
+      return Math.min(retries * 50, 1000); // increasing delay with max of 1s
+    },
+    connectTimeout: 10000, // 10 seconds
+  },
 });
 
 redisClient.on("connect", () => {
@@ -13,10 +33,18 @@ redisClient.on("connect", () => {
 });
 
 redisClient.on("error", (err: Error) => {
-  console.error("Error", err);
+  console.error("Redis Error", err);
 });
 
-redisClient.connect().catch(console.error);
+// Wrap connection in try/catch to handle errors better
+(async () => {
+  try {
+    await redisClient.connect();
+    console.log("Redis connection established successfully");
+  } catch (error) {
+    console.error("Failed to connect to Redis:", error);
+  }
+})();
 
 export const getRedisKey = (req: Request) => {
   const key = `${req.url}|+|${
