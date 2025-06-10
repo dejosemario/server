@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "start": "cross-env NODE_ENV=production node build/server.js",
-    "dev": "cross-env NODE_ENV=production nodemon --exec ts-node src/server.ts --trace-warnings",
+    "dev": "cross-env NODE_ENV=production nodemon --exec ts-node src/server.ts ",
     "setup": "npm install",
     "test": "jest --watchAll --no-cache"
   },
