@@ -12,6 +12,7 @@ import cors from "cors";
 import morgan from "morgan";
 import { config } from "dotenv";
 import rateLimit from "express-rate-limit";
+import { connectRedis } from "./integrations/redis";
 
 config();
 
@@ -88,6 +89,12 @@ class EventfulApp {
     } catch (error) {
       console.error("Failed to connect to the database:", error);
       console.log("Server will start anyway and retry database connection...");
+    }
+
+    try {
+      await connectRedis();
+    } catch (error) {
+      console.log("Redis unavailable - continuing without cache");
     }
 
     this.app.listen(this.port, "0.0.0.0", () => {
