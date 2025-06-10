@@ -4,9 +4,9 @@
   "description": "",
   "main": "dist/server.ts",
   "scripts": {
-    "build": "tsc ",
-    "start": "set NODE_ENV=production && node build/server.js",
-    "dev": "set NODE_ENV=production && nodemon --exec ts-node src/server.ts --trace-warnings",
+    "build": "tsc && webpack --config build/webpack.config.js",
+    "start": "cross-env NODE_ENV=production node build/server.js",
+    "dev": "cross-env NODE_ENV=production nodemon --exec ts-node src/server.ts --trace-warnings",
     "setup": "npm install",
     "test": "jest --watchAll --no-cache"
   },
@@ -38,6 +38,7 @@
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
+    "cross-env": "^7.0.3",
     "dotenv": "^16.5.0",
     "express": "^4.19.2",
     "express-rate-limit": "^7.5.0",
