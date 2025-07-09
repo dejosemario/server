@@ -36,6 +36,23 @@ const userSchema  = new Schema<UserDocument>(
   { timestamps: true }
 );
 
+userSchema.pre('findOneAndDelete', async function() {
+  const userId = this.getQuery()._id;
+  await mongoose.model('Booking').deleteMany({ user: userId });
+});
+
+userSchema.pre('deleteOne', async function() {
+  const userId = this.getQuery()._id;
+  await mongoose.model('Booking').deleteMany({ user: userId });
+});
+
+// Also handle deleteMany if you ever bulk delete users
+userSchema.pre('deleteMany', async function() {
+  const users = await this.model.find(this.getQuery());
+  const userIds = users.map(user => user._id);
+  await mongoose.model('Booking').deleteMany({ user: { $in: userIds } });
+});
+
 // Add toJSON options
 userSchema.set('toJSON', {
   virtuals: true,
