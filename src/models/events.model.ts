@@ -1,20 +1,23 @@
 import mongoose, { Document, Schema } from "mongoose";
 
 // Define the ticket type schema
-export const ticketTypeSchema = new Schema({
-  name: {
-    type: String,
-    required: true,
+export const ticketTypeSchema = new Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+    },
+    price: {
+      type: Number,
+      required: true,
+    },
+    limit: {
+      type: Number,
+      required: true,
+    },
   },
-  price: {
-    type: Number,
-    required: true,
-  },
-  limit: {
-    type: Number,
-    required: true,
-  }
-}, { _id: false }); // `_id: false` to avoid creating an _id field for ticket types
+  { _id: false }
+); // `_id: false` to avoid creating an _id field for ticket types
 
 export interface EventDocument extends Document {
   name: string;
@@ -28,7 +31,7 @@ export interface EventDocument extends Document {
   media?: string[];
   guests?: string[];
   creator: mongoose.Types.ObjectId; // Reference to the User
-  ticketTypes?: typeof ticketTypeSchema[];
+  ticketTypes?: (typeof ticketTypeSchema)[];
 }
 
 const eventSchema = new Schema<EventDocument>(
@@ -45,7 +48,7 @@ const eventSchema = new Schema<EventDocument>(
     organizer: {
       type: String,
       required: true,
-    },    
+    },
     date: {
       type: Date,
       required: true,
@@ -96,6 +99,24 @@ const eventSchema = new Schema<EventDocument>(
   },
   { timestamps: true }
 );
+
+// Middleware to handle cascading delete of bookings when an event is deleted
+eventSchema.pre("findOneAndDelete", async function () {
+  const eventId = this.getQuery()._id;
+  await mongoose.model("Booking").deleteMany({ event: eventId });
+});
+
+eventSchema.pre("deleteOne", async function () {
+  const eventId = this.getQuery()._id;
+  await mongoose.model("Booking").deleteMany({ event: eventId });
+});
+
+// Also handle deleteMany if you ever bulk delete events
+eventSchema.pre("deleteMany", async function () {
+  const events = await this.model.find(this.getQuery());
+  const eventIds = events.map((event) => event._id);
+  await mongoose.model("Booking").deleteMany({ event: { $in: eventIds } });
+});
 
 const Event = mongoose.model<EventDocument>("Event", eventSchema);
 

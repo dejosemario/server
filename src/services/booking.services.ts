@@ -69,7 +69,7 @@ class BookingService {
     const bookings = await BookingModel.find({ user: userId })
       .populate("event")
       .sort({ createdAt: -1 });
-    return bookings;
+    return bookings.filter(booking => booking.event !== null);
   }
 
   public async getAllBookings() {
@@ -77,7 +77,7 @@ class BookingService {
       .populate("event")
       .populate("user")
       .sort({ createdAt: -1 });
-    return bookings;
+  return bookings.filter(booking => booking.event !== null);
   }
 
   public async cancelBooking(
@@ -152,7 +152,7 @@ class BookingService {
       const event = booking.event as any;
       if (!event) {
         throw new Error("Event not found");
-      }      
+      }
 
       const eventDateTime = new Date(
         `${event.date.toISOString().split("T")[0]}T${event.time}`
@@ -160,7 +160,6 @@ class BookingService {
       const expirationTime = new Date(
         eventDateTime.getTime() + 12 * 60 * 60 * 1000
       );
-
 
       // Generate QR code URL
       const qrCodeUrl = await this.generateQRCode(
@@ -194,33 +193,31 @@ class BookingService {
           color: "50-15-0",
         },
       });
-  
+
       const qrBuffer = Buffer.from(qr.data);
       const fileName = `qrcodes/${Date.now()}.svg`;
-  
-  
+
       const file = bucket.file(fileName);
-  
+
       await file.save(qrBuffer, {
         contentType: "image/svg+xml",
         public: true,
-      });  
-  
+      });
+
       const expirationTime = new Date(eventStartTime);
       expirationTime.setHours(expirationTime.getHours() + 12);
-  
+
       const [signedUrl] = await file.getSignedUrl({
         action: "read",
         expires: expirationTime,
       });
-  
+
       return signedUrl;
     } catch (error: any) {
       console.error("Error generating QR code:", error);
       throw new Error(`Error generating QR code: ${error.message}`);
     }
   }
-  
 }
 
 export default BookingService;
