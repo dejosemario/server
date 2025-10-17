@@ -35,54 +35,32 @@ jobs:
           remote_port: 21098
 
       - name: Install dependencies and restart on server
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: dumomvte
           key: ${{ secrets.SSH_KEY }}
           port: 21098
           script: |
+            set -e
             cd /home/dumomvte/eventful-api.dumostech.com
-            
-            # Install production dependencies
             npm install --production
-            
-            # Create .env if it doesn't exist
             if [ ! -f .env ]; then
               echo "PORT=8000" > .env
               echo "NODE_ENV=production" >> .env
               echo "FIREBASE_SERVICE_ACCOUNT=./firebase-service-account.json" >> .env
-              echo "⚠️  Created default .env file - update it with your variables!"
             fi
-            
-            # Create Firebase service account JSON file
-            cat > firebase-service-account.json << 'EOF'
-            ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
-            EOF
-            
-            # Set proper permissions for Firebase JSON
+            echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}' > firebase-service-account.json
             chmod 600 firebase-service-account.json
-            
-            # Check if PM2 is installed, if not install it
             if ! command -v pm2 &> /dev/null; then
-              echo "📦 PM2 not found, installing..."
               npm install -g pm2
-              pm2 startup systemd -u $USER --hp $HOME
-              echo "✅ PM2 installed and configured"
-            else
-              echo "✅ PM2 already installed"
+              pm2 startup systemd -u dumomvte --hp /home/dumomvte
             fi
-            
-            # Restart with PM2 (or start if not running)
             if pm2 describe eventful-api > /dev/null 2>&1; then
-              echo "🔄 Restarting existing app..."
               pm2 restart eventful-api
             else
-              echo "🚀 Starting new app..."
               pm2 start build/server.js --name eventful-api
             fi
-            
-            # Save PM2 process list
             pm2 save
 
       - name: Notify deployment status
