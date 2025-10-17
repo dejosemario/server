@@ -54,8 +54,17 @@ jobs:
             if [ ! -f .env ]; then
               echo "PORT=8000" > .env
               echo "NODE_ENV=production" >> .env
+              echo "FIREBASE_SERVICE_ACCOUNT=./firebase-service-account.json" >> .env
               echo "⚠️  Created default .env file - update it with your variables!"
             fi
+            
+            # Create Firebase service account JSON file
+            cat > firebase-service-account.json << 'EOF'
+            ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+            EOF
+            
+            # Set proper permissions for Firebase JSON
+            chmod 600 firebase-service-account.json
             
             # Check if PM2 is installed, if not install it
             if ! command -v pm2 &> /dev/null; then
