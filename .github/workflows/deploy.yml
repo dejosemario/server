@@ -26,11 +26,8 @@ jobs:
       - name: Deploy files with rsync
         uses: burnett01/rsync-deployments@6.0.0
         with:
-          switches: -avzr --delete --exclude=node_modules --exclude=.env
-          path: |
-            build/
-            package.json
-            package-lock.json
+          switches: -avzr --delete --exclude=node_modules --exclude=.env --exclude=firebase-service-account.json
+          path: ./
           remote_path: /home/dumomvte/eventful-api.dumostech.com/
           remote_host: ${{ secrets.SERVER_HOST }}
           remote_user: ${{ secrets.SERVER_USER }}
