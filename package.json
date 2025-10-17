@@ -5,8 +5,8 @@
   "main": "dist/server.ts",
   "scripts": {
     "build": "tsc",
-    "start": "cross-env NODE_ENV=production node build/server.js",
-    "dev": "cross-env NODE_ENV=production nodemon --exec ts-node src/server.ts ",
+    "start": "NODE_ENV=production node build/server.js",
+    "dev": "NODE_ENV=development nodemon --exec ts-node src/server.ts",
     "setup": "npm install",
     "test": "jest --watchAll --no-cache"
   },

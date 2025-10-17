@@ -1,0 +1,93 @@
+name: Deploy to Namecheap
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install and build
+        run: |
+          npm ci
+          npm run build
+
+      - name: Deploy files with rsync
+        uses: burnett01/rsync-deployments@6.0.0
+        with:
+          switches: -avzr --delete --exclude=node_modules --exclude=.env
+          path: |
+            build/
+            package.json
+            package-lock.json
+          remote_path: /home/dumomvte/eventful-api.dumostech.com/
+          remote_host: ${{ secrets.SERVER_HOST }}
+          remote_user: ${{ secrets.SERVER_USER }}
+          remote_key: ${{ secrets.SSH_KEY }}
+          remote_port: ${{ secrets.SSH_PORT }}
+
+      - name: Install dependencies and restart on server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            cd /home/dumomvte/eventful-api.dumostech.com
+            
+            # Install production dependencies
+            npm install --production
+            
+            # Create .env if it doesn't exist
+            if [ ! -f .env ]; then
+              echo "PORT=8000" > .env
+              echo "NODE_ENV=production" >> .env
+              echo "⚠️  Created default .env file - update it with your variables!"
+            fi
+            
+            # Check if PM2 is installed, if not install it
+            if ! command -v pm2 &> /dev/null; then
+              echo "📦 PM2 not found, installing..."
+              npm install -g pm2
+              
+              # Setup PM2 to start on boot
+              pm2 startup systemd -u $USER --hp $HOME
+              echo "✅ PM2 installed and configured"
+            else
+              echo "✅ PM2 already installed"
+            fi
+            
+            # Restart with PM2 (or start if not running)
+            if pm2 describe eventful-api > /dev/null 2>&1; then
+              echo "🔄 Restarting existing app..."
+              pm2 restart eventful-api
+            else
+              echo "🚀 Starting new app..."
+              pm2 start build/server.js --name eventful-api
+            fi
+            
+            # Save PM2 process list
+            pm2 save
+
+      - name: Notify deployment status
+        if: always()
+        run: |
+          if [ ${{ job.status }} == 'success' ]; then
+            echo "✅ Deployment successful!"
+            echo "🌐 Visit: https://eventful-api.dumostech.com"
+          else
+            echo "❌ Deployment failed"
+            exit 1
+          fi
