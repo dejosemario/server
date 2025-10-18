@@ -24,17 +24,15 @@ jobs:
           npm run build
 
       - name: Deploy files with rsync
-        run: |
-          echo "${{ secrets.SSH_KEY }}" > deploy_key
-          chmod 600 deploy_key
-          rsync -avzr --delete \
-            --exclude=node_modules \
-            --exclude=.env \
-            --exclude=firebase-service-account.json \
-            -e "ssh -i deploy_key -p 21098 -o StrictHostKeyChecking=no" \
-            ./ \
-            dumomvte@${{ secrets.SERVER_HOST }}:/home/dumomvte/eventful-api.dumostech.com/
-          rm -f deploy_key
+        uses: burnett01/rsync-deployments@6.0.0
+        with:
+          switches: -avzr --delete --exclude=node_modules --exclude=.env --exclude=firebase-service-account.json
+          path: build/
+          remote_path: /home/dumomvte/eventful-api.dumostech.com/
+          remote_host: ${{ secrets.SERVER_HOST }}
+          remote_user: ${{ secrets.SERVER_USER }}
+          remote_key: ${{ secrets.SSH_KEY }}
+          remote_port: ${{ secrets.SSH_PORT }}
 
       - name: Install dependencies and restart on server
         uses: appleboy/ssh-action@v1.0.3
@@ -42,7 +40,7 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: dumomvte
           key: ${{ secrets.SSH_KEY }}
-          port: 21098
+          port: ${{ secrets.SSH_PORT }}
           script: |
             set -e
             cd /home/dumomvte/eventful-api.dumostech.com
