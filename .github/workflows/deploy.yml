@@ -50,11 +50,7 @@ jobs:
             echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}' > firebase-service-account.json
             chmod 600 firebase-service-account.json
 
-            # Restart app via cPanel's Node.js interface
-            # This command restarts the app registered in cPanel
-            /usr/local/bin/cloudlinux-selector restart-webapp eventful-api.dumostech.com
-
-            echo "✅ Deployment complete!"
+            echo "✅ Deployment complete! cPanel will auto-restart the app."
 
       - name: Notify deployment status
         if: always()
