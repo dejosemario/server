@@ -33,8 +33,9 @@ class EventfulApp {
   private initializeMiddlewares() {
     // Enable Cross Origin Resource Sharing
     this.app.set("trust proxy", 1);
+
     const corsOptions = {
-      origin: process.env.FRONTEND_URL,
+      origin: process.env.FRONTEND_URL || "https://de-eventful.vercel.app",
       credentials: true,
       optionsSuccessStatus: 200,
     };

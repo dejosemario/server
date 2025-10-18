@@ -52,13 +52,3 @@ jobs:
 
             echo "✅ Deployment complete! cPanel will auto-restart the app."
 
-      - name: Notify deployment status
-        if: always()
-        run: |
-          if [ ${{ job.status }} == 'success' ]; then
-            echo "✅ Deployment successful!"
-            echo "🌐 Visit: https://eventful-api.dumostech.com"
-          else
-            echo "❌ Deployment failed"
-            exit 1
-          fi
