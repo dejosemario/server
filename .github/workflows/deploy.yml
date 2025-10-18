@@ -26,7 +26,7 @@ jobs:
       - name: Deploy files with rsync
         uses: burnett01/rsync-deployments@6.0.0
         with:
-          switches: -avzr --delete --exclude=node_modules --exclude=.env --exclude=firebase-service-account.json
+          switches: -avzr --delete --exclude=node_modules --exclude=.env --exclude=firebase-service-account.json --exclude=.git --exclude=src --exclude=tests
           path: .
           remote_path: /home/dumomvte/eventful-api.dumostech.com/
           remote_host: ${{ secrets.SERVER_HOST }}
@@ -34,7 +34,7 @@ jobs:
           remote_key: ${{ secrets.SSH_KEY }}
           remote_port: ${{ secrets.SSH_PORT }}
 
-      - name: Install dependencies and restart on server
+      - name: Install dependencies and restart app
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SERVER_HOST }}
@@ -44,27 +44,17 @@ jobs:
           script: |
             set -e
             cd /home/dumomvte/eventful-api.dumostech.com
-            npm install --production
-
-            # Create .env if it doesn't exist
-            if [ ! -f .env ]; then
-              echo "PORT=8000" > .env
-              echo "NODE_ENV=production" >> .env
-              echo "FIREBASE_SERVICE_ACCOUNT=./firebase-service-account.json" >> .env
-              echo "⚠️  Created default .env file - update it with your variables!"
-            fi
+            npm ci --omit=dev
 
             # Create Firebase service account JSON from secret
             echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}' > firebase-service-account.json
             chmod 600 firebase-service-account.json
 
-            # Restart or start the app
-            if pm2 describe eventful-api > /dev/null 2>&1; then
-              pm2 restart eventful-api
-            else
-              pm2 start build/server.js --name eventful-api
-            fi
-            pm2 save
+            # Restart app via cPanel's Node.js interface
+            # This command restarts the app registered in cPanel
+            /usr/local/bin/cloudlinux-selector restart-webapp eventful-api.dumostech.com
+
+            echo "✅ Deployment complete!"
 
       - name: Notify deployment status
         if: always()
