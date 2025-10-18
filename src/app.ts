@@ -41,8 +41,9 @@ class EventfulApp {
     };
 
     this.app.use(cors(corsOptions));
+
     // Handle preflight requests
-    // this.app.options("*", cors(corsOptions));
+    this.app.options("*", cors(corsOptions));
 
     this.app.use(express.json());
     this.app.use(cookieParser());
