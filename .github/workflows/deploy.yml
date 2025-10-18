@@ -68,7 +68,7 @@ jobs:
             if pm2 describe eventful-api > /dev/null 2>&1; then
               pm2 restart eventful-api
             else
-              pm2 start build/server.js --name eventful-api
+              pm2 start server.js --name eventful-api
             fi
             pm2 save
 
