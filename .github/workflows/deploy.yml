@@ -7,7 +7,6 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -26,7 +25,8 @@ jobs:
       - name: Deploy files with rsync
         uses: burnett01/rsync-deployments@6.0.0
         with:
-          switches: -avzr --delete --exclude=node_modules --exclude=.env --exclude=firebase-service-account.json --exclude=.git --exclude=src --exclude=tests
+          # Include dist folder, exclude source files and dev dependencies
+          switches: -avzr --delete --exclude=node_modules --exclude=.env --exclude=firebase-service-account.json --exclude=.git --exclude=src --exclude=tests --exclude=tsconfig.json --exclude=.github
           path: .
           remote_path: /home/dumomvte/eventful-api.dumostech.com/
           remote_host: ${{ secrets.SERVER_HOST }}
@@ -34,7 +34,7 @@ jobs:
           remote_key: ${{ secrets.SSH_KEY }}
           remote_port: ${{ secrets.SSH_PORT }}
 
-      - name: Install dependencies and restart app
+      - name: Install production dependencies and setup secrets
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SERVER_HOST }}
@@ -44,11 +44,21 @@ jobs:
           script: |
             set -e
             cd /home/dumomvte/eventful-api.dumostech.com
+            
+            # Install ONLY production dependencies (no TypeScript needed)
             npm ci --omit=dev
-
+            
             # Create Firebase service account JSON from secret
             echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}' > firebase-service-account.json
             chmod 600 firebase-service-account.json
-
-            echo "✅ Deployment complete! cPanel will auto-restart the app."
-
+            
+            # Verify build folder exists
+            if [ ! -d "build" ]; then
+              echo "❌ Error: build folder not found!"
+              exit 1
+            fi
+            
+            # Restart the application with PM2
+            pm2 restart eventful-api || pm2 start build/server.js --name eventful-api --node-args="--max-old-space-size=2048"
+            
+            echo "✅ Deployment complete and app restarted!"
