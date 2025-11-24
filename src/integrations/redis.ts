@@ -4,7 +4,6 @@ import { Request } from "express";
 import dotenv from "dotenv";
 dotenv.config();
 
-// For debugging purposes - helps identify what URL is being used
 console.log(
   `Redis URL being used: ${
     process.env.NODE_ENV === "production"
