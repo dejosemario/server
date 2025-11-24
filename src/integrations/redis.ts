@@ -25,6 +25,7 @@ const redisClient: RedisClientType = redis.createClient({
             return Math.min(retries * 50, 1000);
         },
         connectTimeout: 10000,
+        tls: false
     },
 });
 
