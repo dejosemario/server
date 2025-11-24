@@ -1,69 +1,78 @@
 name: Deploy to Namecheap VPS
-
 on:
-  push:
-    branches: [main]
-
+    push:
+        branches: [main]
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    deploy:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          cache: "npm"
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "22"
+                  cache: "npm"
 
-      - name: Install and build
-        run: |
-          npm ci
-          npm run build
+            - name: Install and build
+              run: |
+                  npm ci
+                  npm run build
 
-      - name: Deploy files with rsync
-        uses: burnett01/rsync-deployments@6.0.0
-        with:
-          # Include dist folder, exclude source files and dev dependencies
-          switches: -avzr --delete --exclude=node_modules --exclude=.env --exclude=firebase-service-account.json --exclude=.git --exclude=src --exclude=tests --exclude=tsconfig.json --exclude=.github
-          path: .
-          remote_path: /home/dumomvte/eventful-api.dumostech.com/
-          remote_host: ${{ secrets.SERVER_HOST }}
-          remote_user: ${{ secrets.SERVER_USER }}
-          remote_key: ${{ secrets.SSH_KEY }}
-          remote_port: ${{ secrets.SSH_PORT }}
+            - name: Deploy files with rsync
+              uses: burnett01/rsync-deployments@6.0.0
+              with:
+                  # Deploy build folder, package files, but exclude dev files
+                  switches: -avzr --delete --exclude=node_modules --exclude=.env --exclude=firebase-service-account.json --exclude=.git --exclude=src --exclude=tests --exclude=.github --exclude=.gitignore --exclude=tsconfig.json --exclude=*.md
+                  path: .
+                  remote_path: /home/dumomvte/eventful-api.dumostech.com/
+                  remote_host: ${{ secrets.SERVER_HOST }}
+                  remote_user: ${{ secrets.SERVER_USER }}
+                  remote_key: ${{ secrets.SSH_KEY }}
+                  remote_port: ${{ secrets.SSH_PORT }}
 
-      - name: Install production dependencies and setup secrets
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: dumomvte
-          key: ${{ secrets.SSH_KEY }}
-          port: ${{ secrets.SSH_PORT }}
-          script: |
-            set -e
-            cd /home/dumomvte/eventful-api.dumostech.com
-            
-            # Install ONLY production dependencies (no TypeScript needed)
-            npm ci --omit=dev
-            
-            # Create Firebase service account JSON from secret
-            echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}' > firebase-service-account.json
-            chmod 600 firebase-service-account.json
-            
-            # Verify build folder exists
-            if [ ! -d "build" ]; then
-              echo "❌ Error: build folder not found!"
-              exit 1
-            fi
-            
-            # Restart the application with PM2
-            pm2 restart eventful-api || pm2 start build/server.js --name eventful-api --node-args="--max-old-space-size=2048"
+            - name: Install production dependencies and setup secrets
+              uses: appleboy/ssh-action@v1.0.3
+              with:
+                  host: ${{ secrets.SERVER_HOST }}
+                  username: dumomvte
+                  key: ${{ secrets.SSH_KEY }}
+                  port: ${{ secrets.SSH_PORT }}
+                  script: |
+                      set -e
+                      cd /home/dumomvte/eventful-api.dumostech.com
 
-            # Save PM2 process list so it survives reboots
-            pm2 save
+                      # Create .env file from GitHub secrets
+                      cat > .env << 'EOF'
+                      NODE_ENV=production
+                      REDIS_URL=${{ secrets.REDIS_URL }}
+                      # Add other environment variables here
+                      EOF
+                      chmod 600 .env
 
-            pm2 status
-            
-            echo "✅ Deployment complete and app restarted!"
+                      # Install ONLY production dependencies
+                      npm ci --omit=dev
+
+                      # Create Firebase service account JSON from secret
+                      echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}' > firebase-service-account.json
+                      chmod 600 firebase-service-account.json
+
+                      # Verify build folder exists
+                      if [ ! -d "build" ]; then
+                        echo "❌ Error: build folder not found!"
+                        ls -la
+                        exit 1
+                      fi
+
+                      # Stop and delete old PM2 process (forces fresh start)
+                      pm2 delete eventful-api || true
+
+                      # Start fresh PM2 process
+                      pm2 start build/server.js --name eventful-api --node-args="--max-old-space-size=2048"
+
+                      # Save PM2 process list so it survives reboots
+                      pm2 save
+                      pm2 status
+
+                      echo "✅ Deployment complete and app restarted with fresh process!"
