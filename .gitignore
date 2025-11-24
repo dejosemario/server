@@ -14,3 +14,5 @@ build/
 *.tmp
 
 eventful-eb4ee-firebase-adminsdk-l20qb-1afe6a7124.json
+
+firebase.json

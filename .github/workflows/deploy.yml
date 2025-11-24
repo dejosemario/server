@@ -64,7 +64,6 @@ jobs:
             # Save PM2 process list so it survives reboots
             pm2 save
 
-            # Show status
             pm2 status
             
             echo "✅ Deployment complete and app restarted!"

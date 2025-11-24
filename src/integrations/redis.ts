@@ -2,61 +2,59 @@ import * as redis from "redis";
 import { RedisClientType } from "redis";
 import { Request } from "express";
 import dotenv from "dotenv";
+
 dotenv.config();
 
-// For debugging purposes - helps identify what URL is being used
 console.log(
-  `Redis URL being used: ${
-    process.env.NODE_ENV === "production"
-      ? "Using production REDIS_URL"
-      : "Using localhost"
-  }`
+    `Redis URL being used: ${
+        process.env.NODE_ENV === "production"
+            ? "Using production REDIS_URL"
+            : "Using localhost"
+    }`,
 );
 
 const redisClient: RedisClientType = redis.createClient({
-  url:
-    process.env.NODE_ENV === "production"
-      ? process.env.REDIS_URL
-      : "redis://localhost:6379",
-  socket: {
-    reconnectStrategy: (retries) => {
-      console.log(`Redis reconnect attempt: ${retries}`);
-      if (retries > 10) return false;
-      return Math.min(retries * 50, 1000);
+    url:
+        process.env.NODE_ENV === "production"
+            ? process.env.REDIS_URL
+            : "redis://localhost:6379",
+    socket: {
+        reconnectStrategy: (retries) => {
+            console.log(`Redis reconnect attempt: ${retries}`);
+            if (retries > 5) return false;
+            return Math.min(retries * 50, 1000);
+        },
+        connectTimeout: 10000,
     },
-    connectTimeout: 10000,
-    tls: process.env.NODE_ENV === "production",
-    rejectUnauthorized: false,
-  },
 });
 
 redisClient.on("connect", () => {
-  console.log("Redis Connected");
+    console.log("Redis Connected");
 });
 
 redisClient.on("error", (err: Error) => {
-  console.error("Redis Error", err);
+    console.error("Redis Error", err);
 });
 
 export const connectRedis = async () => {
-  try {
-    await redisClient.connect();
-    console.log("Redis connection established successfully");
-    return true;
-  } catch (error) {
-    console.error("Failed to connect to Redis:", error);
-    console.log("App will continue without Redis caching");
-    return false;
-  }
+    try {
+        await redisClient.connect();
+        console.log("Redis connection established successfully");
+        return true;
+    } catch (error) {
+        console.error("Failed to connect to Redis:", error);
+        console.log("App will continue without Redis caching");
+        return false;
+    }
 };
 
 export const getRedisKey = (req: Request) => {
-  const key = `${req.url}|+|${
-    (req as any).user ? (req as any).user.email : "-"
-  }|+|${JSON.stringify((req as any).query)}|+|${JSON.stringify(
-    (req as any).params
-  )}`;
-  return key;
+    const key = `${req.url}|+|${
+        (req as any).user ? (req as any).user.email : "-"
+    }|+|${JSON.stringify((req as any).query)}|+|${JSON.stringify(
+        (req as any).params,
+    )}`;
+    return key;
 };
 
 export default redisClient;
