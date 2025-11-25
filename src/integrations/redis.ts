@@ -17,8 +17,6 @@ const redisUrl =
         ? process.env.REDIS_URL
         : "redis://localhost:6379";
 
-const isRedisCloud = redisUrl?.includes("redislabs.com");
-
 const redisClient: RedisClientType = redis.createClient({
     url: redisUrl,
     socket: {
@@ -28,10 +26,8 @@ const redisClient: RedisClientType = redis.createClient({
             return Math.min(retries * 50, 1000);
         },
         connectTimeout: 10000,
-        ...(isRedisCloud && {
-            tls: true,
-            rejectUnauthorized: false,
-        }),
+        tls: process.env.NODE_ENV === "production",
+        rejectUnauthorized: false,
     },
 });
 
@@ -41,24 +37,12 @@ redisClient.on("error", (err: Error) => {
 
 export const connectRedis = async () => {
     try {
-        console.log("=== Redis Connection Debug Info ===");
-        console.log("Environment:", process.env.NODE_ENV);
-        console.log(
-            "Redis URL:",
-            process.env.REDIS_URL
-                ? process.env.REDIS_URL.replace(/:[^:@]+@/, ":****@")
-                : "redis://localhost:6379",
-        );
-        console.log("Attempting connection...");
-
         if (!redisClient.isOpen) {
             await redisClient.connect();
         }
-
         console.log("✅ Redis connection established successfully");
         await redisClient.ping();
         console.log("✅ Redis PING successful");
-
         return true;
     } catch (error) {
         console.error("❌ Failed to connect to Redis");
