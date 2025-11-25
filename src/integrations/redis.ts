@@ -1,52 +1,24 @@
-import * as redis from "redis";
-import { RedisClientType } from "redis";
+import { Redis } from "@upstash/redis";
 import { Request } from "express";
 import dotenv from "dotenv";
 dotenv.config();
 
-console.log(
-    `Redis URL being used: ${
-        process.env.NODE_ENV === "production"
-            ? "Using production REDIS_URL"
-            : "Using localhost"
-    }`,
-);
+console.log("Redis: Using Upstash REST API");
 
-const redisUrl =
-    process.env.NODE_ENV === "production"
-        ? process.env.REDIS_URL
-        : "redis://localhost:6379";
-
-const redisClient: RedisClientType = redis.createClient({
-    url: redisUrl,
-    socket: {
-        reconnectStrategy: (retries) => {
-            console.log(`Redis reconnect attempt: ${retries}`);
-            if (retries > 5) return false;
-            return Math.min(retries * 50, 1000);
-        },
-        connectTimeout: 10000,
-        tls: process.env.NODE_ENV === "production",
-        rejectUnauthorized: false,
-    },
-});
-
-redisClient.on("error", (err: Error) => {
-    console.error("Redis Error", err);
+const redis = new Redis({
+    url: process.env.UPSTASH_REDIS_REST_URL || "http://localhost:6379",
+    token: process.env.UPSTASH_REDIS_REST_TOKEN || "",
 });
 
 export const connectRedis = async () => {
     try {
-        if (!redisClient.isOpen) {
-            await redisClient.connect();
-        }
-        console.log("✅ Redis connection established successfully");
-        await redisClient.ping();
-        console.log("✅ Redis PING successful");
+        console.log("Testing Redis connection...");
+        await redis.set("connection_test", "success");
+        const result = await redis.get("connection_test");
+        console.log("✅ Redis connection successful:", result);
         return true;
     } catch (error) {
-        console.error("❌ Failed to connect to Redis");
-        console.error("Full error:", error);
+        console.error("❌ Failed to connect to Redis:", error);
         console.log("App will continue without Redis caching");
         return false;
     }
@@ -61,4 +33,4 @@ export const getRedisKey = (req: Request) => {
     return key;
 };
 
-export default redisClient;
+export default redis;

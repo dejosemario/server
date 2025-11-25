@@ -55,7 +55,7 @@ export class EventController extends BaseController {
 
     const filters = { searchText, date: start };
     const data = await this.eventService.getAllEvents(filters);
-    redisClient.setEx("events", 12 * 60 * 60, JSON.stringify(data));
+    redisClient.setex("events", 12 * 60 * 60, JSON.stringify(data));
     if (data) return this.success(res, 200, "Events fetched", data);
     this.error(res, 500, "Internal Error");
   };
@@ -65,7 +65,7 @@ export class EventController extends BaseController {
     //authenictate user to be sure he is the creator of the event
     const userId = (req as any).user?.id;
     const data = await this.eventService.getEventById(id);
-    redisClient.setEx("eventById", 12 * 60 * 60, JSON.stringify(data));
+    redisClient.setex("eventById", 12 * 60 * 60, JSON.stringify(data));
     if (data) return this.success(res, 200, "Event fetched", data);
     this.error(res, 404, "Event not found");
   };

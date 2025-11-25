@@ -32,7 +32,7 @@ export class BookingController extends BaseController {
     const bookings = await this.bookingService.getUserBookings(
       (req as any).user.id
     );
-    redisClient.setEx("userBooking", 12 * 60 * 60, JSON.stringify(bookings));
+    redisClient.setex("userBooking", 12 * 60 * 60, JSON.stringify(bookings));
 
     return res.status(200).json({ bookings });
   };
@@ -43,7 +43,7 @@ export class BookingController extends BaseController {
     }
 
     const bookings = await this.bookingService.getAllBookings();
-    redisClient.setEx("GetAllBookings", 12 * 60 * 60, JSON.stringify(bookings));
+    redisClient.setex("GetAllBookings", 12 * 60 * 60, JSON.stringify(bookings));
     return res.status(200).json({ bookings });
   };
 

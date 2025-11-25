@@ -15,7 +15,7 @@ export default class UserController extends BaseController {
   async getUser(req: Request, res: Response): Promise<any> {
     const userId = (req as any).user?._id;
     const data = await this.userService.findById(userId);
-    redisClient.setEx("user", 12 * 60 * 60, JSON.stringify(data));
+    redisClient.setex("user", 12 * 60 * 60, JSON.stringify(data));
     if (!data) return this.error(res, 404, "Can not retrieve User");
     return this.success(res, 200, "User fetched successfully", data);
   }
