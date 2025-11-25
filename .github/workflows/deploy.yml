@@ -41,15 +41,7 @@ jobs:
                   port: ${{ secrets.SSH_PORT }}
                   script: |
                       set -e
-                      cd /home/dumomvte/eventful-api.dumostech.com
-
-                      # Create .env file from GitHub secrets
-                      cat > .env << 'EOF'
-                      NODE_ENV=production
-                      REDIS_URL=${{ secrets.REDIS_URL }}
-                      # Add other environment variables here
-                      EOF
-                      chmod 600 .env
+                      cd /home/dumomvte/eventful-api.dumostech.com                    
 
                       # Install ONLY production dependencies
                       npm ci --omit=dev
