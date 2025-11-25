@@ -2,7 +2,6 @@ import * as redis from "redis";
 import { RedisClientType } from "redis";
 import { Request } from "express";
 import dotenv from "dotenv";
-
 dotenv.config();
 
 console.log(
@@ -20,7 +19,7 @@ const redisClient: RedisClientType = redis.createClient({
             : "redis://localhost:6379",
     socket: {
         reconnectStrategy: (retries) => {
-            console.log(`Redis reconnect attempt: ${retries}`);
+            console.log(`Redis reconnect attempt: ${retries}`); // FIXED HERE
             if (retries > 5) return false;
             return Math.min(retries * 50, 1000);
         },
@@ -38,11 +37,26 @@ redisClient.on("error", (err: Error) => {
 
 export const connectRedis = async () => {
     try {
-        await redisClient.connect();
-        console.log("Redis connection established successfully");
+        console.log("=== Redis Connection Debug Info ===");
+        console.log("Environment:", process.env.NODE_ENV);
+        console.log("Redis URL:", process.env.REDIS_URL ? 
+            process.env.REDIS_URL.replace(/:[^:@]+@/, ':****@') : 
+            "redis://localhost:6379"
+        );
+        console.log("Attempting connection...");
+        
+        if (!redisClient.isOpen) {
+            await redisClient.connect();
+        }
+        
+        console.log("✅ Redis connection established successfully");
+        await redisClient.ping();
+        console.log("✅ Redis PING successful");
+        
         return true;
     } catch (error) {
-        console.error("Failed to connect to Redis:", error);
+        console.error("❌ Failed to connect to Redis");
+        console.error("Full error:", error);
         console.log("App will continue without Redis caching");
         return false;
     }
