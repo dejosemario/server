@@ -12,23 +12,27 @@ console.log(
     }`,
 );
 
+const redisUrl =
+    process.env.NODE_ENV === "production"
+        ? process.env.REDIS_URL
+        : "redis://localhost:6379";
+
+const isRedisCloud = redisUrl?.includes("redislabs.com");
+
 const redisClient: RedisClientType = redis.createClient({
-    url:
-        process.env.NODE_ENV === "production"
-            ? process.env.REDIS_URL
-            : "redis://localhost:6379",
+    url: redisUrl,
     socket: {
         reconnectStrategy: (retries) => {
-            console.log(`Redis reconnect attempt: ${retries}`); // FIXED HERE
+            console.log(`Redis reconnect attempt: ${retries}`);
             if (retries > 5) return false;
             return Math.min(retries * 50, 1000);
         },
         connectTimeout: 10000,
+        ...(isRedisCloud && {
+            tls: true,
+            rejectUnauthorized: false,
+        }),
     },
-});
-
-redisClient.on("connect", () => {
-    console.log("Redis Connected");
 });
 
 redisClient.on("error", (err: Error) => {
@@ -39,20 +43,22 @@ export const connectRedis = async () => {
     try {
         console.log("=== Redis Connection Debug Info ===");
         console.log("Environment:", process.env.NODE_ENV);
-        console.log("Redis URL:", process.env.REDIS_URL ? 
-            process.env.REDIS_URL.replace(/:[^:@]+@/, ':****@') : 
-            "redis://localhost:6379"
+        console.log(
+            "Redis URL:",
+            process.env.REDIS_URL
+                ? process.env.REDIS_URL.replace(/:[^:@]+@/, ":****@")
+                : "redis://localhost:6379",
         );
         console.log("Attempting connection...");
-        
+
         if (!redisClient.isOpen) {
             await redisClient.connect();
         }
-        
+
         console.log("✅ Redis connection established successfully");
         await redisClient.ping();
         console.log("✅ Redis PING successful");
-        
+
         return true;
     } catch (error) {
         console.error("❌ Failed to connect to Redis");
