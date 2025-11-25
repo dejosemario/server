@@ -24,7 +24,7 @@ jobs:
               uses: burnett01/rsync-deployments@6.0.0
               with:
                   # Deploy build folder, package files, but exclude dev files
-                  switches: -avzr --delete --exclude=node_modules --exclude=.env --exclude=firebase-service-account.json --exclude=.git --exclude=src --exclude=tests --exclude=.github --exclude=.gitignore --exclude=tsconfig.json --exclude=*.md
+                  switches: -avzr --exclude=node_modules --exclude=.env --exclude=firebase-service-account.json --exclude=.git --exclude=src --exclude=tests --exclude=.github --exclude=.gitignore --exclude=tsconfig.json --exclude=*.md
                   path: .
                   remote_path: /home/dumomvte/eventful-api.dumostech.com/
                   remote_host: ${{ secrets.SERVER_HOST }}
