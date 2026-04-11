@@ -10,6 +10,9 @@
     "setup": "npm install",
     "test": "jest --watchAll --no-cache"
   },
+  "engines": {
+      "node": ">=20.0.0"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
