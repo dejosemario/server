@@ -16,6 +16,12 @@ import { connectRedis } from "./integrations/redis";
 
 config();
 
+const allowedOrigins = [
+    "https://de-eventful.vercel.app",
+    "https://eventful.dumostech.com",
+    process.env.FRONTEND_URL,
+].filter((origin): origin is string => Boolean(origin));
+
 class EventfulApp {
     public app: Express; // Property to store the Express app instance
     private port: number;
@@ -35,10 +41,7 @@ class EventfulApp {
         this.app.set("trust proxy", 1);
 
         const corsOptions = {
-            origin: [
-                "https://de-eventful.vercel.app",
-                "https://eventful.dumostech.com",
-            ],
+            origin: allowedOrigins,
             credentials: true,
             optionsSuccessStatus: 200,
         };
