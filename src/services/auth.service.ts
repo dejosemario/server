@@ -36,7 +36,7 @@ export default class AuthService {
             });
         }
 
-        const { password: _, ...safeUser } = user.toJson();
+        const { password: _, ...safeUser } = user.toJSON();
         const token = generateToken({ id: user._id, name: user.name });
         return { token, user: safeUser };
     }
