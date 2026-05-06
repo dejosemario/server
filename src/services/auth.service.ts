@@ -2,13 +2,8 @@ import User from "../models/users.model";
 import { hashPassword, comparePassword, generateToken } from "../utils";
 
 export default class AuthService {
-    async getUserByEmail(email: string) {
-        const user = await User.findOne({ email });
-
-        if (user) {
-            return user;
-        }
-        return null;
+    private async getUserByEmail(email: string) {
+        return User.findOne({ email }).lean();
     }
 
     public async createUser(payload: any) {
