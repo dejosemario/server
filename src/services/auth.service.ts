@@ -9,7 +9,7 @@ export default class AuthService {
     public async createUser(payload: any) {
         const userExists = await this.getUserByEmail(payload.email);
         if (userExists)
-            throw { message: "User Already Exists", statusCode: 400 };
+        throw Object.assign(new Error("User Already Exists"), { statusCode: 400 });
         const hashedPassword = await hashPassword(payload.password);
         const user = await User.create({
             ...payload,
@@ -31,12 +31,12 @@ export default class AuthService {
             });
         }
 
-        const { password: _, ...safeUser } = user.toJSON();
+        const { password: _, ...safeUser } = user.toObject();
         const token = generateToken({ id: user._id, name: user.name });
         return { token, user: safeUser };
     }
 
     public async refreshToken(refreshToken: string) {
-        return refreshToken;
+        return refreshToken; 
     }
 }
