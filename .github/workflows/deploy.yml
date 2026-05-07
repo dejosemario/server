@@ -45,6 +45,12 @@ jobs:
                       [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
                       mkdir -p /home/josemaria/server
                       cd /home/josemaria/server
+                      
+                      # ✅ Stop old process FIRST to release file locks
+                      pm2 delete server || true
+
+                      # ✅ Clean node_modules to prevent ENOTEMPTY errors
+                      rm -rf node_modules
 
                       # Install ONLY production dependencies
                       npm ci --omit=dev
