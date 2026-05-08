@@ -127,7 +127,7 @@ class BookingService {
     }
     const emailPayload = {
       email: userObj.email,
-      subject: "Booking Cancellation - SheyEvents",
+      subject: "Booking Cancellation - Eventful",
       text: `You have successfully cancelled your booking for ${event?.name}.`,
       html: ``,
     };
