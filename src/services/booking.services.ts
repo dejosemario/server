@@ -163,7 +163,7 @@ class BookingService {
 
       // Generate QR code URL
       const qrCodeUrl = await this.generateQRCode(
-        `https://de-eventful.vercel.app//events/${bookingId}`,
+        `https://de-eventful.vercel.app/events/${bookingId}`,
         expirationTime
       );
 
