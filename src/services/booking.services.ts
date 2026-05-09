@@ -48,7 +48,6 @@ class BookingService {
       ticketTypes: updatedTicketTypes,
     });
 
-    // Send email
     const userObj = await UserModel.findById(user);
     if (!userObj) {
       throw new Error("User not found");
