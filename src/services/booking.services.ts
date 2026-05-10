@@ -23,10 +23,8 @@ class BookingService {
   public async createBooking(user: ObjectId, bookingData: any) {
     bookingData.user = user;
 
-    // Create booking
     const booking = await BookingModel.create(bookingData);
 
-    // Update event tickets
     const event = await EventModel.findById(bookingData.event);
     if (!event) {
       throw new Error("Event not found");
