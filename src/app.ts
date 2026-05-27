@@ -23,12 +23,12 @@ const allowedOrigins = [
 ].filter((origin): origin is string => Boolean(origin));
 
 class EventfulApp {
-    public app: Express; // Property to store the Express app instance
+    public app: Express;
     private port: number;
     private appName: string;
 
     constructor(port: number) {
-        this.app = express(); // Initializing the app property
+        this.app = express(); 
         this.port = port;
         this.appName = this.constructor.name;
         this.initializeMiddlewares();
@@ -37,7 +37,6 @@ class EventfulApp {
     }
 
     private initializeMiddlewares() {
-        // Enable Cross Origin Resource Sharing
         this.app.set("trust proxy", 1);
 
         const corsOptions = {
