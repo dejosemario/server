@@ -3,7 +3,7 @@ import { hashPassword, comparePassword, generateToken } from "../utils";
 
 export default class AuthService {
     private async getUserByEmail(email: string) {
-        return User.findOne({ email }).lean();
+        return User.findOne({ email })
     }
 
     public async createUser(payload: any) {
