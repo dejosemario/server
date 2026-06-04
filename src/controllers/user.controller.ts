@@ -28,14 +28,12 @@ export default class UserController extends BaseController {
       role: { role },
     } = req.body;
     const userId = (req as any).user?._id;
-    // validate the new role
     const user = await this.userService.findById(userId);
 
     if (!this.allowedRoles.includes(role)) {
       return this.error(res, 400, "Invalid role provided");
     }
 
-    // Perform role-specific logic or validation
     if (user.role === "eventee" && role !== "creator") {
       return this.error(res, 400, "Invalid role transition");
     }
