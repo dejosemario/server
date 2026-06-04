@@ -22,12 +22,11 @@ export class EventController extends BaseController {
       return this.error(res, 400, errorMessage);
     }
 
-    // Ensure user ID is present
     const userId = (req as any).user?._id;
     if (!userId) {
       return this.error(res, 401, "u"); 
     }
-    // Create event data with the logged-in user's ID
+
     const eventData = { ...req.body, creator: userId };
 
     const data = await this.eventService.createEvent(eventData);
